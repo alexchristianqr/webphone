@@ -280,7 +280,7 @@
 </template>
 
 <script>
-	import '../../lib/webphone_api.js'
+	import '../../../public/webphone_api.js'
 
 	export default {
 		name:'Phone',
