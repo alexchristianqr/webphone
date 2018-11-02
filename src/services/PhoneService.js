@@ -10,8 +10,8 @@ export default new Vuex.Store({
 			Axios.get('http://192.168.80.4:82/listado-telefonos?cliente_id=6-1-5983-15233',{}).then((r)=>{
 				if(r.status === 200){
 					self.dataList=r.data
+					self.dataList.push([12345,'955588297'])
 					self.doStart()
-					// self.dataList.push([12345,'955588297'])
 				}
 			}).catch((e)=>{
 				console.error(e)
