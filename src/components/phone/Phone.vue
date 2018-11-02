@@ -174,10 +174,10 @@
                         <tbody>
                         <tr v-for="(v,k) in dataList" class="my-auto">
                             <td class="my-auto">
-                                <span class="my-auto">{{v.number}}</span>
+                                <span class="my-auto">{{v[1]}}</span>
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-success btn-sm btn-block" @click="doCall(v)">Llamar</button>
+                                <button class="btn btn-success btn-sm btn-block" @click="doCall(v[1])">Llamar</button>
                             </td>
                         </tr>
                         </tbody>
@@ -281,10 +281,12 @@
 
 <script>
 	import '../../../public/webphone_api.js'
+    import PhoneService from '../../services/PhoneService'
 
 	export default {
 		name:'Phone',
 		data:()=>({
+
 			status:{connected:false},
 			screen:{
 				inCall:true,
@@ -336,20 +338,18 @@
 					playback:50,
 				},
 			},
-            dataList:[
-            	{
-            		number:'955588297',
-                    status:true
-                },
-            	],
+            dataList:[],
             validate:{
 				call:false
             }
 		}),
         created(){
-			this.doStart()
+	        this.getData()
         },
 		methods:{
+			getData(){
+			    PhoneService.dispatch('getData',{self:this})
+            },
 			validateCall(){
 				this.screen.inCall=webphone_api.isincall()
             },
@@ -379,11 +379,11 @@
 					return false
 				}
 			},
-			doCall(v){
+			doCall(number){
 				this.screen.start=true
 				this.screen.inCall=true
 				this.button.call=false
-				webphone_api.call(v.number)
+				webphone_api.call(number)
 			},
 			doHangup(){
 				this.screen.start=false
