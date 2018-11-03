@@ -5,8 +5,7 @@
             <div class="row">
                 <div class="col-8 my-auto"><h6>Webphone Securitec</h6></div>
                 <div class="col-4 text-right">
-                    <button type="button" class="btn btn-secondary" data-toggle="modal"
-                            data-target="#modalConfiguration">
+                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalConfiguration">
                         <i class="fa fa-cog"></i>
                     </button>
                 </div>
@@ -15,7 +14,7 @@
         <div class="col-sm-12 col-md-12 col-lg-4 offset-lg-4 offset-md-4 ">
             <div class="mt-3">
                 <div class="card" v-show="screen.start">
-                    <div class="card-body m-0 p-2">
+                    <div hidden class="card-body m-0 p-2">
                         <template v-if="screen.inCall">
                             <div class="text-center">
                                 <div class="w-100">
@@ -81,31 +80,37 @@
                             </div>
                         </template>
                         <div class="row">
-                            <template v-if="button.call">
+                            <template v-if="button.call.status">
                                 <div class="col-8 pr-1"><!-- Llamar -->
-                                    <button @click="doCall" class="btn btn-success btn-lg btn-block">Call</button>
+                                    <button @click="doCall" :disabled="button.call.disabled" class="btn btn-success btn-block">Call</button>
                                 </div>
                                 <div class="col-4 pl-0"><!-- Eliminar Caracter -->
-                                    <button type="button" class="btn btn-secondary btn-lg btn-block"><i class="fa fa-reply"></i></button>
+                                    <button type="button" class="btn btn-secondary btn-block"><i class="fa fa-reply"></i></button>
                                 </div>
                             </template>
-                            <template v-if="!button.call">
-                                <div class="col-3">
-                                    <template v-if="button.hold"><!-- Pausar Llamada -->
-                                        <button type="button" @click="doHold" class="btn btn-outline-secondary btn-lg btn-block"><i class="fa fa-play"></i></button>
+                            <template v-if="!button.call.status">
+                                <div class="col-4">
+                                    <span class="btn btn-block">
+                                        <i class="fa fa-user-circle mr-3"></i>
+                                        <small>{{timer}}</small>
+                                    </span>
+                                </div>
+                                <div class="col-2">
+                                    <template v-if="button.hold.status"><!-- Pausar Llamada -->
+                                        <button type="button" :disabled="button.hold.disabled" @click="doHold" class="btn btn-outline-secondary btn-block"><i class="fa fa-play"></i></button>
                                     </template>
                                     <template v-else><!-- Retomar Llamada -->
-                                        <button type="button" @click="doHold" class="btn btn-outline-secondary btn-lg btn-block"><i class="fa fa-pause"></i></button>
+                                        <button type="button" :disabled="button.hold.disabled" @click="doHold" class="btn btn-outline-secondary btn-block"><i class="fa fa-pause"></i></button>
                                     </template>
                                 </div>
-                                <div class="col-3"><!-- Transferir Llamada -->
-                                    <button title="Tranferir Llamada" @click="doTranfer" :class="button.transfer ? 'btn btn-outline-secondary btn-lg btn-block active' : 'btn btn-outline-secondary btn-lg btn-block'"><i class="fa fa-retweet"></i></button>
+                                <div class="col-2"><!-- Transferir Llamada -->
+                                    <button title="Tranferir Llamada" :disabled="button.transfer.disabled" @click="doTranfer" :class="button.transfer.status ? 'btn btn-outline-secondary btn-block active' : 'btn btn-outline-secondary btn-block'"><i class="fa fa-retweet"></i></button>
                                 </div>
-                                <div class="col-3"><!-- Mute Llamada -->
-                                    <button :title="button.mute ? 'Poner en silencio' : 'Quitar silencio'" @click="doMute" :class="button.mute ? 'btn btn-outline-secondary btn-lg btn-block active' : 'btn btn-outline-secondary btn-lg btn-block'"><i class="fa fa-volume-off"></i></button>
+                                <div class="col-2"><!-- Mute Llamada -->
+                                    <button :disabled="button.mute.disabled" :title="button.mute.status ? 'Poner en silencio' : 'Quitar silencio'" @click="doMute" :class="button.mute.status ? 'btn btn-outline-secondary btn-block active' : 'btn btn-outline-secondary btn-block'"><i class="fa fa-volume-off"></i></button>
                                 </div>
-                                <div class="col-3"><!-- Colgar Llamada -->
-                                    <button @click="doHangup" class="btn btn-danger btn-lg btn-block"><i class="fa fa-times"></i></button>
+                                <div class="col-2"><!-- Colgar Llamada -->
+                                    <button :disabled="button.hangup.disabled" @click="doHangup" class="btn btn-danger btn-block"><i class="fa fa-times"></i></button>
                                 </div>
                             </template>
                         </div>
@@ -157,7 +162,7 @@
                                     </template>
                                 </template>
                             </div>
-                            <button type="button" class="btn btn-success btn-block btn-lg" @click="doTranferCall">Tranferir Llamada</button>
+                            <button type="button" class="btn btn-success btn-block" @click="doTranferCall">Tranferir Llamada</button>
                         </div>
                     </template>
                 </div>
@@ -183,8 +188,12 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
+        </div>
+        <div class="container w-100">
+            <pre class="bg-light" style="max-height: 200px;min-height: 200px">
+                <code class="ml-2 mr-2" v-html="print_console"></code>
+            </pre>
         </div>
 
         <!-- Footer -->
@@ -286,7 +295,8 @@
 	export default {
 		name:'Phone',
 		data:()=>({
-
+            timer:'',
+            print_console:'',
 			status:{connected:false},
 			screen:{
 				inCall:true,
@@ -327,11 +337,11 @@
 				{chart:'#', value:'', icon:'fa fa-hashtag'},
 			],
 			button:{
-				call:false,
-				hold:false,
-				mute:false,
-				hangup:false,
-				transfer:false,
+				call:{status:false,disabled:true},
+				hold:{status:false,disabled:true},
+				mute:{status:false,disabled:true},
+				hangup:{status:false,disabled:true},
+				transfer:{status:false,disabled:true},
 				volume:{
 					microphone:75,
 					ringback:50,
@@ -345,6 +355,8 @@
 		}),
         created(){
 	        this.getData()
+            this.listenChanges()
+	        this.printConsoleEvents()
         },
 		methods:{
 			getData(){
@@ -363,14 +375,6 @@
 				webphone_api.setparameter('serveraddress', this.params.domain)
 				webphone_api.start()
 			},
-			returnLetterDos(position){
-				let chart=this.dataTeclado[position].chart.toString()
-				if(this.params.destination.length <= 8){
-					this.params.destination=this.params.destination.concat(chart)
-				}else{
-					return false
-				}
-			},
 			returnLetter(position){
 				let chart=this.dataTeclado[position].chart.toString()
 				if(this.input.transfer.length <= 8){
@@ -382,25 +386,31 @@
 			doCall(number){
 				this.screen.start=true
 				this.screen.inCall=true
-				this.button.call=false
+				this.button.call.status=false
 				webphone_api.call(number)
 			},
 			doHangup(){
 				this.screen.start=false
 				this.screen.inCall=false
-				this.button.call=true
+				this.button.call.status=true
+
+				this.button.mute.disabled=true
+				this.button.hold.disabled=true
+				this.button.transfer.disabled=true
+				this.button.hangup.disabled=true
+
 				webphone_api.hangup()
 			},
 			doSetVolume(type_event, vol){
 				webphone_api.setvolume(type_event, vol)
 			},
 			doHold(){
-				this.button.hold= !this.button.hold
-				webphone_api.hold(this.button.hold)
+				this.button.hold.status= !this.button.hold.status
+				webphone_api.hold(this.button.hold.status)
 			},
             doMute(){
-	            this.button.mute= !this.button.mute
-				webphone_api.mute(this.button.mute)
+	            this.button.mute.status= !this.button.mute.status
+				webphone_api.mute(this.button.mute.status)
             },
 			doTranfer(){
 				this.doHold()
@@ -409,9 +419,48 @@
 			doTranferCall(){
 				this.doHold()
 				this.screen.inTransfer= !this.screen.inTransfer
-				this.button.transfer= !this.button.transfer
+				this.button.transfer.status= !this.button.transfer.status
 				webphone_api.transfer(this.input.transfer);
-				this.validateCall()
+			},
+			listenChanges(){
+				webphone_api.onCallStateChange((event, direction)=>{
+					switch(event){
+                        case 'callSetup':
+	                        if(direction == 1){
+		                        // means it's outgoing call
+	                        }else if(direction == 2){
+		                        // means it's icoming call
+	                        }
+	                        break
+                        case 'callDisconnected':
+	                        this.doHangup()
+                            break
+                        case 'callRinging':
+                        	console.log('Ring Ring')
+                            break
+                        case 'callConnected':
+	                        this.button.mute.disabled=false
+	                        this.button.hold.disabled=false
+	                        this.button.hangup.disabled=false
+	                        this.button.transfer.disabled=false
+                            break
+					}
+				})
+			},
+            printConsoleEvents(){
+	            webphone_api.onEvents((evt)=>{
+		            //ProcessEvents(evt);
+		            let evtarray = evt.split(',');
+		            if (evtarray[0] === 'STATUS' && evtarray[2] !== 'Ringing...'){
+                        this.timer=evtarray[2].replace('Speaking (','').replace('sec)' != undefined ? 'sec)' : '','')
+		            }
+		            this.print_console+='<span class="ml-3 mr-3">'+evt+'</span><br>';
+	            });
+            },
+            listenCdr(){
+                webphone_api.onCdr(function (caller, called, connecttime, direction, peerdisplayname, reason, line){
+	                this.print_console='<p>CDR: caller: ' + caller + ', called: ' + called + ', connecttime: ' + connecttime + ', direction: ' + direction + ', peerdisplayname: ' + peerdisplayname + ', reason: ' + reason + ', line: ' + line+'</p>';
+                })
 			}
 		},
 	}
