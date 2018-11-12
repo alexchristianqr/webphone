@@ -11,6 +11,7 @@ export default new Vuex.Store({
 				if(r.status === 200){
 					self.dataList=r.data
 					self.dataList.push([12345,'955588297'])
+					self.dataList.push([12346,'922902044'])
 					self.doStart()
 				}
 			}).catch((e)=>{

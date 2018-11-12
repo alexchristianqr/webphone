@@ -13,108 +13,8 @@
         </nav>
         <div class="col-sm-12 col-md-12 col-lg-4 offset-lg-4 offset-md-4 ">
             <div class="mt-3">
+                <!-- App Webphone -->
                 <div class="card" v-show="screen.start">
-                    <div hidden class="card-body m-0 p-2">
-                        <template v-if="screen.inCall">
-                            <div class="text-center">
-                                <div class="w-100">
-                                    <span class="h4 text-secondary">(+51) {{params.destination}}</span>
-                                </div>
-                                <div class="mt-2 mb-2">
-                                    <i class="fa fa-user-circle fa-5x text-muted"></i>
-                                </div>
-                                <div class="w-100">
-                                    <span class="text-secondary">{{time.start}}</span>
-                                </div>
-                            </div>
-                        </template>
-                        <template v-if="!screen.inCall">
-                            <div class="form-group-sm">
-                                <div class="input-group input-group-lg">
-                                    <input ref="inputDestination" v-model="params.destination" type="text" class="form-control" maxlength="9">
-                                    <template v-if="params.destination !== ''">
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-danger" @click="doClear"><i class="fa fa-times"></i></button>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                    <div class="card-footer pl-2 pr-2 pb-2">
-                        <template v-if="!screen.inCall">
-                            <div class="row">
-                                <template v-for="(v,k) in dataTeclado">
-                                    <template v-if="k%3 === 0">
-                                        <div class="col-4 pr-0">
-                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="returnLetter(k)">
-                                                <template v-if="v.icon !== undefined">
-                                                    <i :class="v.icon"></i>
-                                                </template>
-                                                <template v-else>
-                                                    <span class="h4">{{v.chart}}</span>
-                                                </template>
-                                            </button>
-                                        </div>
-                                    </template>
-                                    <template v-if="k%3 === 1">
-                                        <div class="col-4 pl-1 pr-1">
-                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="returnLetter(k)">
-                                                <span class="h4">{{v.chart}}</span>
-                                            </button>
-                                        </div>
-                                    </template>
-                                    <template v-if="k%3 === 2">
-                                        <div class="col-4 pl-0">
-                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="returnLetter(k)">
-                                                <template v-if="v.icon !== undefined">
-                                                    <i :class="v.icon"></i>
-                                                </template>
-                                                <template v-else>
-                                                    <span class="h4">{{v.chart}}</span>
-                                                </template>
-                                            </button>
-                                        </div>
-                                    </template>
-                                </template>
-                            </div>
-                        </template>
-                        <div class="row">
-                            <template v-if="button.call.status">
-                                <div class="col-8 pr-1"><!-- Llamar -->
-                                    <button @click="doCall" :disabled="button.call.disabled" class="btn btn-success btn-block">Call</button>
-                                </div>
-                                <div class="col-4 pl-0"><!-- Eliminar Caracter -->
-                                    <button type="button" class="btn btn-secondary btn-block"><i class="fa fa-reply"></i></button>
-                                </div>
-                            </template>
-                            <template v-if="!button.call.status">
-                                <div class="col-4">
-                                    <span class="btn btn-block">
-                                        <i class="fa fa-user-circle mr-3"></i>
-                                        <small>{{timer}}</small>
-                                    </span>
-                                </div>
-                                <div class="col-2">
-                                    <template v-if="button.hold.status"><!-- Pausar Llamada -->
-                                        <button type="button" :disabled="button.hold.disabled" @click="doHold" class="btn btn-outline-secondary btn-block"><i class="fa fa-play"></i></button>
-                                    </template>
-                                    <template v-else><!-- Retomar Llamada -->
-                                        <button type="button" :disabled="button.hold.disabled" @click="doHold" class="btn btn-outline-secondary btn-block"><i class="fa fa-pause"></i></button>
-                                    </template>
-                                </div>
-                                <div class="col-2"><!-- Transferir Llamada -->
-                                    <button title="Tranferir Llamada" :disabled="button.transfer.disabled" @click="doTranfer" :class="button.transfer.status ? 'btn btn-outline-secondary btn-block active' : 'btn btn-outline-secondary btn-block'"><i class="fa fa-retweet"></i></button>
-                                </div>
-                                <div class="col-2"><!-- Mute Llamada -->
-                                    <button :disabled="button.mute.disabled" :title="button.mute.status ? 'Poner en silencio' : 'Quitar silencio'" @click="doMute" :class="button.mute.status ? 'btn btn-outline-secondary btn-block active' : 'btn btn-outline-secondary btn-block'"><i class="fa fa-volume-off"></i></button>
-                                </div>
-                                <div class="col-2"><!-- Colgar Llamada -->
-                                    <button :disabled="button.hangup.disabled" @click="doHangup" class="btn btn-danger btn-block"><i class="fa fa-times"></i></button>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
                     <template v-if="screen.inTransfer">
                         <div class="card-body">
                             <div class="form-group">
@@ -162,9 +62,50 @@
                                     </template>
                                 </template>
                             </div>
-                            <button type="button" class="btn btn-success btn-block" @click="doTranferCall">Tranferir Llamada</button>
+                            <button type="button" :disabled="input.transfer===''?true:false" class="btn btn-success btn-block btn-lg" @click="doTranferCall">Transferir Llamada</button>
                         </div>
                     </template>
+                    <div class="card-footer pl-2 pr-2 pb-2">
+                        <div class="row">
+                            <template v-if="button.call.status">
+                                <div class="col-8 pr-1"><!-- Llamar -->
+                                    <button @click="doCall" :disabled="button.call.disabled" class="btn btn-success btn-block">Call</button>
+                                </div>
+                                <div class="col-4 pl-0"><!-- Eliminar Caracter -->
+                                    <button type="button" class="btn btn-secondary btn-block"><i class="fa fa-reply"></i></button>
+                                </div>
+                            </template>
+                            <template v-if="!button.call.status">
+                                <div class="col-4">
+                                    <span class="btn btn-block">
+                                        <i class="fa fa-user-circle mr-3"></i>
+                                        <small>{{timer}}</small>
+                                    </span>
+                                </div>
+                                <div class="col-2"><!-- Pausar Llamada -->
+                                    <button type="button" :disabled="button.hold.disabled" @click="doHold" class="btn btn-secondary btn-block">
+                                        <i v-show="button.hold.status" class="fa fa-play"></i>
+                                        <i v-show="!button.hold.status" class="fa fa-pause"></i>
+                                    </button>
+                                </div>
+                                <div class="col-2"><!-- Transferir Llamada -->
+                                    <button title="Tranferir Llamada" :disabled="button.transfer.disabled" @click="doTranfer" class="btn btn-secondary btn-block">
+                                        <i v-show="!button.transfer.status" class="fa fa-retweet"></i>
+                                        <i v-show="button.transfer.status" class="fa fa-exchange"></i>
+                                    </button>
+                                </div>
+                                <div class="col-2"><!-- Mute Llamada -->
+                                        <button :disabled="button.mute.disabled" @click="doMute" class="btn btn-secondary btn-block">
+                                            <i v-show="!button.mute.status" class="fa fa-microphone"></i>
+                                            <i v-show="button.mute.status" class="fa fa-microphone-slash"></i>
+                                        </button>
+                                </div>
+                                <div class="col-2"><!-- Colgar Llamada -->
+                                    <button :disabled="button.hangup.disabled" @click="doHangup" class="btn btn-danger btn-block"><i class="fa fa-times"></i></button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Lista de Llamadas -->
@@ -295,7 +236,9 @@
 	export default {
 		name:'Phone',
 		data:()=>({
-            timer:'',
+			timer: '00:00:00',
+            totalSeconds:0,
+			timerUpdate: null,
             print_console:'',
 			status:{connected:false},
 			screen:{
@@ -340,31 +283,30 @@
 				call:{status:false,disabled:true},
 				hold:{status:false,disabled:true},
 				mute:{status:false,disabled:true},
-				hangup:{status:false,disabled:true},
+				hangup:{status:false,disabled:false},
 				transfer:{status:false,disabled:true},
 				volume:{
 					microphone:75,
-					ringback:50,
-					playback:50,
+					ringback:75,
+					playback:75,
 				},
 			},
             dataList:[],
             validate:{
 				call:false
-            }
+            },
 		}),
+        beforeCreate(){
+        },
         created(){
 	        this.getData()
+	        this.listenPrintEvents()
             this.listenChanges()
-	        this.printConsoleEvents()
         },
 		methods:{
 			getData(){
-			    PhoneService.dispatch('getData',{self:this})
-            },
-			validateCall(){
-				this.screen.inCall=webphone_api.isincall()
-            },
+				PhoneService.dispatch('getData', {self:this})
+			},
 			doClear(){
 				this.input.transfer=''
 				this.$refs.inputDestination.focus()
@@ -393,13 +335,12 @@
 				this.screen.start=false
 				this.screen.inCall=false
 				this.button.call.status=true
-
+				//
 				this.button.mute.disabled=true
 				this.button.hold.disabled=true
 				this.button.transfer.disabled=true
-				this.button.hangup.disabled=true
-
 				webphone_api.hangup()
+				this.stopInterval()
 			},
 			doSetVolume(type_event, vol){
 				webphone_api.setvolume(type_event, vol)
@@ -408,14 +349,22 @@
 				this.button.hold.status= !this.button.hold.status
 				webphone_api.hold(this.button.hold.status)
 			},
-            doMute(){
-	            this.button.mute.status= !this.button.mute.status
+			doMute(){
+				this.button.mute.status= !this.button.mute.status
 				webphone_api.mute(this.button.mute.status)
-            },
+			},
 			doTranfer(){
-				this.doHold()
-	            this.screen.inTransfer= !this.screen.inTransfer
-            },
+				this.button.transfer.status= !this.button.transfer.status
+				if(!this.button.hold.status){
+					this.doHold()
+				}
+				// else{
+				// 	if(this.button.hold.status){
+				// 		this.doHold()
+				// 	}
+				// }
+				this.screen.inTransfer= !this.screen.inTransfer
+			},
 			doTranferCall(){
 				this.doHold()
 				this.screen.inTransfer= !this.screen.inTransfer
@@ -425,42 +374,52 @@
 			listenChanges(){
 				webphone_api.onCallStateChange((event, direction)=>{
 					switch(event){
-                        case 'callSetup':
-	                        if(direction == 1){
-		                        // means it's outgoing call
-	                        }else if(direction == 2){
-		                        // means it's icoming call
-	                        }
-	                        break
-                        case 'callDisconnected':
-	                        this.doHangup()
-                            break
-                        case 'callRinging':
-                        	console.log('Ring Ring')
-                            break
-                        case 'callConnected':
-	                        this.button.mute.disabled=false
-	                        this.button.hold.disabled=false
-	                        this.button.hangup.disabled=false
-	                        this.button.transfer.disabled=false
-                            break
+						case 'callSetup':
+							if(direction == 1){
+								// means it's outgoing call
+							}else if(direction == 2){
+								// means it's icoming call
+							}
+							break
+						case 'callDisconnected':
+							this.doHangup()
+							break
+						case 'callRinging':
+							console.log('Ring Ring')
+							break
+						case 'callConnected':
+							this.button.mute.disabled=false
+							this.button.hold.disabled=false
+							this.button.transfer.disabled=false
+							this.startInterval()
+							break
 					}
 				})
 			},
-            printConsoleEvents(){
-	            webphone_api.onEvents((evt)=>{
-		            //ProcessEvents(evt);
-		            let evtarray = evt.split(',');
-		            if (evtarray[0] === 'STATUS' && evtarray[2] !== 'Ringing...'){
-                        this.timer=evtarray[2].replace('Speaking (','').replace('sec)' != undefined ? 'sec)' : '','')
-		            }
-		            this.print_console+='<span class="ml-3 mr-3">'+evt+'</span><br>';
-	            });
-            },
-            listenCdr(){
-                webphone_api.onCdr(function (caller, called, connecttime, direction, peerdisplayname, reason, line){
-	                this.print_console='<p>CDR: caller: ' + caller + ', called: ' + called + ', connecttime: ' + connecttime + ', direction: ' + direction + ', peerdisplayname: ' + peerdisplayname + ', reason: ' + reason + ', line: ' + line+'</p>';
-                })
+			listenPrintEvents(){
+				webphone_api.onEvents((evt)=>{
+					//ProcessEvents(evt);
+					// let evtarray = evt.split(',');
+					// if (evtarray[0] === 'STATUS' && evtarray[2] !== 'Ringing...'){
+					//     this.timer=evtarray[2].replace('Speaking (','').replace('sec)' != undefined ? 'sec)' : '','')
+					// }
+					this.print_console+='<span class="ml-3 mr-3">' + evt + '</span><br>';
+				});
+			},
+			startInterval(){
+				this.totalSeconds=0
+				this.timerUpdate=setInterval(()=>{
+					++this.totalSeconds//incrementar
+					let hour = ('0' + Math.floor(this.totalSeconds / 3600 % 24)).slice(-2),//Obtener hora
+						minute = ('0' + Math.floor(this.totalSeconds / 60 % 60)).slice(-2),//Obtener minuto
+						seconds = ('0' + Math.floor(this.totalSeconds % 60)).slice(-2)//Obtener segundo
+					this.timer=hour + ":" + minute + ":" + seconds;//00:00:00
+				}, 1000)
+			},
+			stopInterval(){
+				clearInterval(this.timerUpdate)
+				this.timerUpdate=null
+				this.timer='00:00:00'
 			}
 		},
 	}
