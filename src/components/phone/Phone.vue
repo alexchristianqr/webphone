@@ -292,9 +292,6 @@
 				},
 			},
             dataList:[],
-            validate:{
-				call:false
-            },
 		}),
         beforeCreate(){
         },
