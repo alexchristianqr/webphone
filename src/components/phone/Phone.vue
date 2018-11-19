@@ -5,13 +5,15 @@
             <div class="row">
                 <div class="col-8 my-auto"><h6>Webphone Securitec</h6></div>
                 <div class="col-4 text-right">
-                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalConfiguration">
-                        <i class="fa fa-cog"></i>
-                    </button>
+                    <template v-if="true">
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalConfiguration">
+                            <i class="fa fa-cog"></i>
+                        </button>
+                    </template>
                 </div>
             </div>
         </nav>
-        <div class="col-sm-12 col-md-12 col-lg-4 offset-lg-4 offset-md-4 ">
+        <div class="col-4 mx-auto">
             <div class="mt-3">
                 <!-- App Webphone -->
                 <div class="card" v-show="screen.start">
@@ -107,39 +109,60 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Lista de Llamadas -->
-                <div class="table-responsive mt-3">
-                    <table class="table table-sm table-bordered">
-                        <thead class="bg-secondary text-white">
-                        <tr>
-                            <th>Número</th>
-                            <th>Acción</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="(v,k) in dataList" class="my-auto">
-                            <td class="my-auto">
-                                <span class="my-auto">{{v[1]}}</span>
-                            </td>
-                            <td class="text-center">
-                                <button class="btn btn-success btn-sm btn-block" @click="doCall(v[1])">Llamar</button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
-        <div class="container w-100">
-            <pre class="bg-light" style="max-height: 200px;min-height: 200px">
-                <code class="ml-2 mr-2" v-html="print_console"></code>
-            </pre>
+
+        <!-- Lista de Llamadas -->
+        <div class="col-6 mx-auto">
+            <div class="table-responsive mt-3">
+                <table class="table table-sm table-bordered">
+                    <thead class="bg-secondary text-white">
+                    <tr>
+                        <th>Telefonos/Cel.</th>
+                        <th>Contactabilidad</th>
+                        <th>Accion</th>
+                        <th>Historial</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(v,k) in dataList" class="my-auto">
+                        <td class="my-auto">
+                            <span class="my-auto">{{v[1]}}</span>
+                        </td>
+                        <td></td>
+                        <td class="text-left">
+                            <button type="button" class="btn btn-success btn-sm mr-1" @click="doCall(v[1])">Llamar</button>
+                            <button type="button" class="btn btn-secondary btn-sm mr-1">Inactivar</button>
+                            <!--<div class="row">-->
+                            <!--<div class="col-6">-->
+                            <!--<button type="button" class="btn btn-success btn-sm btn-block" @click="doCall(v[1])">Llamar</button>-->
+                            <!--</div>-->
+                            <!--<div class="col-6">-->
+                            <!--<button type="button" class="btn btn-secondary btn-sm btn-block">Inactivar</button>-->
+                            <!--</div>-->
+                            <!--</div>-->
+                        </td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm btn-block">Ver Historial</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+
+        <!-- Activar para depurar data -->
+        <template v-if="true">
+            <div class="container w-100">
+                <pre class="bg-light" style="max-height: 200px;min-height: 200px">
+                    <code class="ml-2 mr-2" v-html="print_console"></code>
+                </pre>
+            </div>
+        </template>
 
         <!-- Footer -->
         <footer class="bg-light p-3 mt-3 text-center w-100">
-            <span class="text-dark">Developed by @AlexChristian</span>
+            <span class="text-dark">Developed by @AlexChristian {{(new Date).getFullYear()}}</span>
         </footer>
 
         <!-- Modal -->
@@ -194,8 +217,7 @@
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
-                                    <span>Volume Microphone <span
-                                            class="text-secondary">({{button.volume.microphone}})</span></span>
+                                    <span>Volume Microphone <span class="text-secondary">({{button.volume.microphone}})</span></span>
                                     <input @change="doSetVolume(0,button.volume.microphone)"
                                            v-model="button.volume.microphone" type="range" class="form-control" min="0"
                                            max="100" step="5" value="100"/>
@@ -208,20 +230,15 @@
                                            max="100" step="5" value="100"/>
                                 </div>
                                 <div class="form-group">
-                                    <span>Volume Playback <span
-                                            class="text-secondary">({{button.volume.playback}})</span></span>
-                                    <input @change="doSetVolume(2,button.volume.playback)"
-                                           v-model="button.volume.playback" type="range" class="form-control" min="0"
-                                           max="100" step="5" value="100"/>
+                                    <span>Volume Playback <span class="text-secondary">({{button.volume.playback}})</span></span>
+                                    <input @change="doSetVolume(2,button.volume.playback)" v-model="button.volume.playback" type="range" class="form-control" min="0" max="100" step="5"/>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button @click.prevent="doStart" type="button" class="btn btn-primary" data-dismiss="modal">
-                            Save
-                        </button>
+                        <button @click.prevent="doStart" type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
                     </div>
                 </div>
             </div>
@@ -293,8 +310,6 @@
 			},
             dataList:[],
 		}),
-        beforeCreate(){
-        },
         created(){
 	        this.getData()
 	        this.listenPrintEvents()
@@ -314,6 +329,12 @@
 				webphone_api.setparameter('serveraddress', this.params.domain)
 				webphone_api.start()
 			},
+            doAccept(){
+	            webphone_api.accept()
+            },
+            doReject(){
+	            webphone_api.reject()
+            },
 			returnLetter(position){
 				let chart=this.dataTeclado[position].chart.toString()
 				if(this.input.transfer.length <= 8){
@@ -332,6 +353,7 @@
 				this.screen.start=false
 				this.screen.inCall=false
 				this.button.call.status=true
+				this.button.transfer.status=false
 				//
 				this.button.mute.disabled=true
 				this.button.hold.disabled=true
@@ -355,11 +377,6 @@
 				if(!this.button.hold.status){
 					this.doHold()
 				}
-				// else{
-				// 	if(this.button.hold.status){
-				// 		this.doHold()
-				// 	}
-				// }
 				this.screen.inTransfer= !this.screen.inTransfer
 			},
 			doTranferCall(){
@@ -395,11 +412,6 @@
 			},
 			listenPrintEvents(){
 				webphone_api.onEvents((evt)=>{
-					//ProcessEvents(evt);
-					// let evtarray = evt.split(',');
-					// if (evtarray[0] === 'STATUS' && evtarray[2] !== 'Ringing...'){
-					//     this.timer=evtarray[2].replace('Speaking (','').replace('sec)' != undefined ? 'sec)' : '','')
-					// }
 					this.print_console+='<span class="ml-3 mr-3">' + evt + '</span><br>';
 				});
 			},
