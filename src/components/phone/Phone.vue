@@ -91,7 +91,7 @@
                                     </button>
                                 </div>
                                 <div class="col-2"><!-- Transferir Llamada -->
-                                    <button title="Tranferir Llamada" :disabled="button.transfer.disabled" @click="doTranfer" class="btn btn-secondary btn-block">
+                                    <button title="Tranferir Llamada" :disabled="button.transfer.disabled" @click="doTransfer" class="btn btn-secondary btn-block">
                                         <i v-show="!button.transfer.status" class="fa fa-retweet"></i>
                                         <i v-show="button.transfer.status" class="fa fa-exchange"></i>
                                     </button>
@@ -372,7 +372,7 @@
 				this.button.mute.status= !this.button.mute.status
 				webphone_api.mute(this.button.mute.status)
 			},
-			doTranfer(){
+			doTransfer(){
 				this.button.transfer.status= !this.button.transfer.status
 				if(!this.button.hold.status){
 					this.doHold()
