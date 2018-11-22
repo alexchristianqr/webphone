@@ -248,22 +248,22 @@
 
 <script>
 	import '../../../public/webphone_api.js'
-    import PhoneService from '../../services/PhoneService'
+	import PhoneService from '../../services/PhoneService'
 
 	export default {
 		name:'Phone',
 		data:()=>({
-			timer: '00:00:00',
-            totalSeconds:0,
-			timerUpdate: null,
-            print_console:'',
+			timer:'00:00:00',
+			totalSeconds:0,
+			timerUpdate:null,
+			print_console:'',
 			status:{connected:false},
 			screen:{
 				inCall:true,
 				inTransfer:false,
 				inPause:false,
 				inVideoCall:false,
-                start:false,
+				start:false,
 			},
 			params:{
 				display_name:'202',
@@ -273,9 +273,9 @@
 				domain:'192.168.80.3',
 				destination:'',
 			},
-            input:{
-			    transfer:''
-            },
+			input:{
+				transfer:'',
+			},
 			time:{
 				start:'00:00:00',
 				end:'00:00:00',
@@ -297,24 +297,24 @@
 				{chart:'#', value:'', icon:'fa fa-hashtag'},
 			],
 			button:{
-				call:{status:false,disabled:true},
-				hold:{status:false,disabled:true},
-				mute:{status:false,disabled:true},
-				hangup:{status:false,disabled:false},
-				transfer:{status:false,disabled:true},
+				call:{status:false, disabled:true},
+				hold:{status:false, disabled:true},
+				mute:{status:false, disabled:true},
+				hangup:{status:false, disabled:false},
+				transfer:{status:false, disabled:true},
 				volume:{
 					microphone:75,
 					ringback:75,
 					playback:75,
 				},
 			},
-            dataList:[],
+			dataList:[],
 		}),
-        created(){
-	        this.getData()
-	        this.listenPrintEvents()
-            this.listenChanges()
-        },
+		created(){
+			this.getData()
+			this.listenPrintEvents()
+			this.listenChanges()
+		},
 		methods:{
 			getData(){
 				PhoneService.dispatch('getData', {self:this})
@@ -329,12 +329,12 @@
 				webphone_api.setparameter('serveraddress', this.params.domain)
 				webphone_api.start()
 			},
-            doAccept(){
-	            webphone_api.accept()
-            },
-            doReject(){
-	            webphone_api.reject()
-            },
+			doAccept(){
+				webphone_api.accept()
+			},
+			doReject(){
+				webphone_api.reject()
+			},
 			returnLetter(position){
 				let chart=this.dataTeclado[position].chart.toString()
 				if(this.input.transfer.length <= 8){
@@ -379,11 +379,14 @@
 				}
 				this.screen.inTransfer= !this.screen.inTransfer
 			},
+			doDTMF(value){
+				webphone_api.dtmf(value)
+			},
 			doTranferCall(){
 				this.doHold()
 				this.screen.inTransfer= !this.screen.inTransfer
 				this.button.transfer.status= !this.button.transfer.status
-				webphone_api.transfer(this.input.transfer);
+				webphone_api.transfer(this.input.transfer)
 			},
 			listenChanges(){
 				webphone_api.onCallStateChange((event, direction)=>{
@@ -412,24 +415,24 @@
 			},
 			listenPrintEvents(){
 				webphone_api.onEvents((evt)=>{
-					this.print_console+='<span class="ml-3 mr-3">' + evt + '</span><br>';
-				});
+					this.print_console+='<span class="ml-3 mr-3">' + evt + '</span><br>'
+				})
 			},
 			startInterval(){
 				this.totalSeconds=0
 				this.timerUpdate=setInterval(()=>{
 					++this.totalSeconds//incrementar
-					let hour = ('0' + Math.floor(this.totalSeconds / 3600 % 24)).slice(-2),//Obtener hora
-						minute = ('0' + Math.floor(this.totalSeconds / 60 % 60)).slice(-2),//Obtener minuto
-						seconds = ('0' + Math.floor(this.totalSeconds % 60)).slice(-2)//Obtener segundo
-					this.timer=hour + ":" + minute + ":" + seconds;//00:00:00
+					let hour=('0' + Math.floor(this.totalSeconds / 3600 % 24)).slice(-2),//Obtener hora
+						minute=('0' + Math.floor(this.totalSeconds / 60 % 60)).slice(-2),//Obtener minuto
+						seconds=('0' + Math.floor(this.totalSeconds % 60)).slice(-2)//Obtener segundo
+					this.timer=hour + ':' + minute + ':' + seconds//00:00:00
 				}, 1000)
 			},
 			stopInterval(){
 				clearInterval(this.timerUpdate)
 				this.timerUpdate=null
 				this.timer='00:00:00'
-			}
+			},
 		},
 	}
 </script>
