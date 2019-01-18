@@ -263,7 +263,6 @@ function TranslateInnerSpanish(str)
             if (str === "transfered initiated successfully") return "Transferencia iniciada con йxito";
             if (str === "wrong username/password") return "Nombre de usuario/contraseсa incorrectos";
             if (str === "Call transfered ") return "Llamada transferida";
-
     }
     catch (e)
     {
@@ -1325,6 +1324,10 @@ function TranslateInnerPr(str)
     {
         str = str.replace("Registered", "Registrado");
         str = str.replace("Credit", "Crйdito");
+        str = str.replace("Call duration", "Duraçao da chamada");
+            if (str === "Ringing") return "Toque";
+            if (str === "Ringing...") return "Toque...";
+            if (str === "Speaking") return "Falando";
             if (str === "Username") return "Usuбrio";
             if (str === "Send") return "Enviar";
             if (str === "Send Chat") return "Enviar Bate-papo";
@@ -1344,6 +1347,13 @@ function TranslateInnerPr(str)
             if (str === "Redial") return "Rediscagem";
             if (str === "Send to") return "Enviar para";
             if (str === "Send") return "Enviar";
+            if (str === "Calling") return "Chamando";
+            if (str === "Calling...") return "Chamando...";
+            if (str === "InProgress...") return "EmProgresso...";
+            if (str === "Call") return "ligar";
+            if (str === "Call rejected") return "Chamada rejeitada";
+            if (str === "service unavailable") return "Serviço indisponível";
+            if (str === "Call rejected: service unavailable") return "Chamada rejeitada: serviço indisponível";
             if (str === "Not Initialized") return "Nгo Inicializado";
             if (str === "Register Failed") return "Registro Falhou";
             if (str === "Registered") return "Registrado";
@@ -1466,6 +1476,7 @@ function TranslateInnerPr(str)
             if (str === "Register") return "Registrar";
             if (str === "Deletable") return "Apagбvel";
             if (str === "Authenticated successfully") return "Autenticado com Sucesso";
+            if (str === "Authenticated successfully.") return "Autenticado com Sucesso";
             if (str === "Incoming") return "Entrada";
             if (str === "Setup") return "Instalaзгo";
             if (str === "My PhoneNumber") return "Meu Nъmero de Telefone";

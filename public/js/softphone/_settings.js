@@ -47,7 +47,7 @@ function onCreate (event) // called only once - bind events here
             try{
                 if (console)
                 {
-                    var emsg = 'GlobalErrorHandler' + msg + ' (' + error + ') url: ' + url + ' line: ' + lineNo + ' col: ' + columnNo;
+                    var emsg = 'GlobalErrorHandler: ERROR, ' + msg + ' (' + error + ') url: ' + url + ' line: ' + lineNo + ' col: ' + columnNo;
                     if (console.error)
                     {
                         console.error(emsg);
@@ -263,8 +263,7 @@ function onStart(event)
         j$('#btn_back_settings').hide();
         j$('#app_name_settings').show();
     }
-
-
+    
 // login page with username and password
 
 //--    if (common.GetConfig('customizedversion') === 'true' && startedfrom !== 'app')
@@ -759,13 +758,17 @@ var changePageCalled = false; //-- cahangePage gets called serveral times, bu we
 function AutoStart() //if server, username and password is set, then auto start (don't show the settings)
 {//--DBG common.PutToDebugLog(3, 'DEBUG, _settings AutoStart called');
     try{
+    
+    common.DisplayStartPage('Settings');
+
+    
     if (startedfrom !== 'app')
     {
         var autologin = false;
 
         var srvTemp = common.GetParameter('serveraddress_user');
         var upperSrvTemp = common.GetParameter('upperserver');
-        var usrTemp = common.GetParameter('sipusername');
+        var usrTemp = common.GetSipusername();
         var pwdTemp = common.GetParameter('password');
 
         if (common.GetParameter('serverinputisupperserver') === 'true')
@@ -814,6 +817,24 @@ function AutoStart() //if server, username and password is set, then auto start 
         {
             autologin = false;
             common.PutToDebugLog(2, 'WARNING,_settings AutoStart disabled, because last login was not successfull');
+
+            common.SaveParameter('last_login_failed', 'true');
+            
+            //-- ha azert all meg a loginnal mert elotte valami gond volt:
+            //--    -kerüljön bele a voip engine a basic settings -be elso beallitasnak
+            //--    -ha megvan adva a configban a serveraddress-username-passsword, akkor menjen be a basic settingsbe (ne a login oldalon alljon meg ahol csak egy settings item van)            
+            var srvtmp = common.GetParameter('serveraddress_user');
+            if (common.isNull(srvtmp) || srvtmp.length < 1) { srvtmp = common.GetParameter('serveraddress_orig'); }
+            if (common.isNull(srvtmp) || srvtmp.length < 1) { srvtmp = common.GetParameter('serveraddress'); }
+            
+            var usrtmp = common.GetSipusername();
+            var pwdtmp = common.GetParameter('password');
+            
+            if (usrtmp.length > 0 && pwdtmp.length > 0
+                    && ( (common.ShowServerInput() && srvtmp.length > 0) || common.ShowServerInput() === false ))
+            {
+                SubmenuSipSettings();
+            }
         }
         
         if (autologin)
@@ -836,6 +857,11 @@ function AutoStart() //if server, username and password is set, then auto start 
 
 
             j$.mobile.changePage("#page_dialpad", { transition: "pop", role: "page" });
+            
+            setTimeout(function ()
+            {
+                common.DisplayStartPage('Dialpad');
+            }, 200);
 
             if (common.IsWindowsSoftphone())
             {
@@ -844,7 +870,7 @@ function AutoStart() //if server, username and password is set, then auto start 
                     webphone_public.webphone_started = false;
 //--                    webphone_public.StartWin();
                     
-                    webphone_api.startInner( common.GetParameter('sipusername'), common.GetParameter('password') );
+                    webphone_api.startInner( common.GetSipusername(), common.GetParameter('password') );
                 }, 100);
             }else
             {
@@ -852,7 +878,7 @@ function AutoStart() //if server, username and password is set, then auto start 
                 {
 //--                    StartWithEngineSelect();
                     
-                    webphone_api.startInner( common.GetParameter('sipusername'), common.GetParameter('password') );
+                    webphone_api.startInner( common.GetSipusername(), common.GetParameter('password') );
                 }, 150);
             }
             
@@ -965,7 +991,10 @@ function WaitForEngineSelectSetting()
 
                 if (common.getuseengine() === global.ENGINE_WEBRTC || common.GetSelectedEngineName() === global.ENGINE_WEBRTC)
                 {
-                    common.TLSReload();
+                    if (common.UseTLSReload() === true)
+                    {
+                        common.TLSReload();
+                    }
                 }
 
                 ShowEngineOptionSettings();
@@ -1096,12 +1125,12 @@ if (common.Glv() < 2) { exregacc = ''; }
 
 //-- rejectonvoipbusy -> removed
 //-- for java applet and service
-var settOrderWebphone = 'serveraddress_user,sipusername,password,submenu_sipsettings,submenu_media,submenu_calldivert,submenu_general,theme,language,'+ exregacc +'email,incomingcallpopup,sendchatonenter,keeprecfiles,proxyaddress,realm,username,displayname,hidemyidentity,usetunneling,transport,use_fast_ice,use_stun,use_rport,register,registerinterval,keepaliveival,keepalive,natopenpackets,ringtimeout,calltimeout,dtmfmode,chatsms,prack,earlymedia,sendrtponmuted,defmute,changesptoring,localip,signalingport,rtpport,capabilityrequest,customsipheader,normalizenumber,techprefix,filters,callforwardonbusy,callforwardonnoanswer,callforwardalways,calltransferalways,transfwithreplace,autoignore,autoaccept,voicemailnum,callbacknumber,blacklist,transfertype,automute,autohold,holdtype,dialerintegration,integrateifwifionly,nativefilterallow,nativefilterblock,audiodevices,displayvolumecontrols,displayaudiodevice,savetocontacts,telsearchkey,extraoption,reset_settings,loglevel,loglevel_dbg,playring,codec,alwaysallowlowcodec,'+
+var settOrderWebphone = 'serveraddress_user,sipusername,password,submenu_sipsettings,submenu_media,submenu_calldivert,submenu_general,theme,language,'+ exregacc +'email,incomingcallpopup,sendchatonenter,keeprecfiles,proxyaddress,realm,username,displayname,hidemyidentity,usetunneling,transport,use_fast_ice,use_stun,use_rport,register,registerinterval,keepaliveival,keepalive,natopenpackets,ringtimeout,calltimeout,enableblf,dtmfmode,chatsms,prack,earlymedia,sendrtponmuted,defmute,changesptoring,localip,signalingport,rtpport,capabilityrequest,customsipheader,normalizenumber,techprefix,filters,callforwardonbusy,callforwardonnoanswer,callforwardonnoanswertimeout,callforwardalways,calltransferalways,transfwithreplace,autoignore,autoaccept,dropsameoldcall,voicemailnum,callbacknumber,blacklist,transfertype,automute,autohold,holdtype,dialerintegration,integrateifwifionly,nativefilterallow,nativefilterblock,audiodevices,displayvolumecontrols,displayaudiodevice,savetocontacts,telsearchkey,extraoption,pushnotifications,reset_settings,loglevel,loglevel_dbg,playring,codec,alwaysallowlowcodec,icetimeout'+
         'audio_bandwidth,video,video_bandwidth,video_width,video_height,'+
         'cfgvideo,video_profile,videocodec,'+ aspeak +
 //--        'submenu_screenshare,sscontrol,ssscroll,sstop,ssquality,'+
         'video_fps,setfinalcodec,aec,denoise,agc,plc,silencesupress,hardwaremedia,volumein,volumeout,mediaencryption,setqos,codecframecount,doublesendrtp,jittersize,audiobufferlength,speakermode';
-var settOrderWebphoneWebRTCFlash = 'serveraddress_user,sipusername,password,submenu_sipsettings,submenu_media,submenu_calldivert,submenu_general,theme,language,'+ exregacc +'email,incomingcallpopup,sendchatonenter,keeprecfiles,proxyaddress,realm,username,displayname,hidemyidentity,usetunneling,ringtimeout,calltimeout,dtmfmode,chatsms,earlymedia,defmute,customsipheader,normalizenumber,techprefix,filters,voicemailnum,callbacknumber,callforwardonbusy,callforwardonnoanswer,callforwardalways,calltransferalways,transfwithreplace,autoignore,autoaccept,blacklist,dialerintegration,integrateifwifionly,nativefilterallow,nativefilterblock,audiodevices,displayvolumecontrols,displayaudiodevice,savetocontacts,telsearchkey,extraoption,reset_settings,loglevel,loglevel_dbg,codec,alwaysallowlowcodec,'+
+var settOrderWebphoneWebRTCFlash = 'serveraddress_user,sipusername,password,submenu_sipsettings,submenu_media,submenu_calldivert,submenu_general,theme,language,'+ exregacc +'email,incomingcallpopup,sendchatonenter,keeprecfiles,proxyaddress,realm,username,displayname,hidemyidentity,usetunneling,ringtimeout,calltimeout,enableblf,dtmfmode,chatsms,earlymedia,defmute,customsipheader,normalizenumber,techprefix,filters,voicemailnum,callbacknumber,callforwardonbusy,callforwardonnoanswer,callforwardonnoanswertimeout,callforwardalways,calltransferalways,transfwithreplace,autoignore,autoaccept,dropsameoldcall,blacklist,dialerintegration,integrateifwifionly,nativefilterallow,nativefilterblock,audiodevices,displayvolumecontrols,displayaudiodevice,savetocontacts,telsearchkey,extraoption,pushnotifications,reset_settings,loglevel,loglevel_dbg,codec,alwaysallowlowcodec,icetimeout,'+
         'audio_bandwidth,video,video_bandwidth,video_width,video_height,'+
         'cfgvideo,video_profile,videocodec,'+ aspeak +
 //--        'submenu_screenshare,sscontrol,ssscroll,sstop,ssquality,'+
@@ -1111,7 +1140,7 @@ var settOrderWebphoneWebRTCFlash = 'serveraddress_user,sipusername,password,subm
 var settOrderReduced = 'serveraddress_user,sipusername,password,username,displayname,email,hidemyidentity,chatsms,voicemailnum,callbacknumber,loglevel';
 
 //-- for windows softphone
-var settOrderWin = 'serveraddress_user,sipusername,password,submenu_sipsettings,submenu_media,submenu_calldivert,submenu_general,theme,language,'+ exregacc +'email,sendchatonenter,keeprecfiles,proxyaddress,realm,username,displayname,flash,beeponincoming,importonlywithnum,hidemyidentity,usetunneling,transport,use_fast_ice,use_stun,use_rport,register,registerinterval,keepaliveival,keepalive,natopenpackets,ringtimeout,calltimeout,dtmfmode,chatsms,prack,earlymedia,sendrtponmuted,defmute,changesptoring,localip,signalingport,rtpport,capabilityrequest,customsipheader,normalizenumber,techprefix,filters,callforwardonbusy,callforwardonnoanswer,callforwardalways,calltransferalways,transfwithreplace,autoignore,autoaccept,rejectonvoipbusy,voicemailnum,callbacknumber,blacklist,transfertype,automute,autohold,holdtype,startwithos,dialerintegration,integrateifwifionly,nativefilterallow,nativefilterblock,audiodevices,displayvolumecontrols,displayaudiodevice,savetocontacts,telsearchkey,extraoption,reset_settings,loglevel,loglevel_dbg,playring,'
+var settOrderWin = 'serveraddress_user,sipusername,password,submenu_sipsettings,submenu_media,submenu_calldivert,submenu_general,theme,language,'+ exregacc +'email,sendchatonenter,keeprecfiles,proxyaddress,realm,username,displayname,flash,beeponincoming,importonlywithnum,hidemyidentity,usetunneling,transport,use_fast_ice,use_stun,use_rport,register,registerinterval,keepaliveival,keepalive,natopenpackets,ringtimeout,calltimeout,enableblf,dtmfmode,chatsms,prack,earlymedia,sendrtponmuted,defmute,changesptoring,localip,signalingport,rtpport,capabilityrequest,customsipheader,normalizenumber,techprefix,filters,callforwardonbusy,callforwardonnoanswer,callforwardonnoanswertimeout,callforwardalways,calltransferalways,transfwithreplace,autoignore,autoaccept,dropsameoldcall,rejectonvoipbusy,voicemailnum,callbacknumber,blacklist,transfertype,automute,autohold,holdtype,startwithos,dialerintegration,integrateifwifionly,nativefilterallow,nativefilterblock,audiodevices,displayvolumecontrols,displayaudiodevice,savetocontacts,telsearchkey,extraoption,pushnotifications,reset_settings,loglevel,loglevel_dbg,playring,'
         +'video,video_bandwidth,video_width,video_height,'
         +'cfgvideo,videomode,video_profile,videocodec,'+
         'submenu_screenshare,sscontrol,ssscroll,sstop,ssquality,'+
@@ -1161,7 +1190,7 @@ function PopulateList() // :no return value
 
         if (common.GetConfigInt('brandid', -1) !== 58) // enikma
         {
-            j$('#lp_username').val(common.GetParameter('sipusername'));
+            j$('#lp_username').val(common.GetSipusername());
             j$('#lp_password').val(common.GetParameter('password'));
         }
         
@@ -1169,7 +1198,7 @@ function PopulateList() // :no return value
 //--	- Pl. ha a password „nopassword” –ra van állitva, akkor ezt kezelni kéne speciálisan a softphone skin –en: annyi az összes tennivaló,
 //--		hogy ilyenkor nemkéne megjeleniteni a password inputot a settingsben és a login képernyőn. Semmi más változtatás nem kell.
 //--	- if username is "anonymous", then treat as nopassword
-        if (common.GetParameter('sipusername') === 'anonymous')
+        if (common.GetSipusername() === 'anonymous')
         {
             j$('#lp_username').hide();
         }
@@ -1497,6 +1526,31 @@ function PopulateList() // :no return value
 //--            settDisplayName = '<b>' + settDisplayName + '</b>';
 //--        }
 
+
+// icetimeout setting on the softphone skin user interface advanced settings (but should not be displayed when used as windows softphone or other engines forced/webrtc engine disabled)
+        if (settName === 'icetimeout')
+        {
+            if (common.IsWindowsSoftphone() === true) { continue; }
+
+            var ep_webrtc = common.GetParameterInt('enginepriority_webrtc', 2);
+            if (ep_webrtc < 1) { continue; }
+
+            var ep_java = common.GetParameterInt('enginepriority_java', 2);
+            var ep_ns = common.GetParameterInt('enginepriority_ns', 2);
+            var ep_flash = common.GetParameterInt('enginepriority_flash', 2);
+            var ep_app = common.GetParameterInt('enginepriority_app', 2);
+            var ep_p2p = common.GetParameterInt('enginepriority_p2p', 2);
+            var ep_accessnum = common.GetParameterInt('enginepriority_accessnum', 2);
+            var ep_nativedial = common.GetParameterInt('enginepriority_nativedial', 2);
+
+            if (ep_webrtc < 3 &&
+                (ep_java > 3 || ep_ns > 3 || ep_flash > 3 || ep_app > 3 || ep_p2p > 3 || ep_accessnum > 3 || ep_nativedial > 3))
+            {
+                continue;
+            }
+        }
+
+
         var comment = '';
         
         if (settIsdefault === '0' || settName === 'sipusername' || settName === 'password' || settName === 'serveraddress_user') // means the default value was changed
@@ -1674,7 +1728,12 @@ function PopulateList() // :no return value
 
 
 //-- show chooseengine setting on login page only if previous engine could not register; 0=unknown, 1=failed, 2=if we received any notification
-if (global.isdebugversion_showengineselection === true || common.GetParameterInt('enproblem', 0) > 0)
+
+//-- ha azert all meg a loginnal mert elotte valami gond volt:
+//--    -kerüljön bele a voip engine a basic settings -be elso beallitasnak
+//--    -ha megvan adva a configban a serveraddress-username-passsword, akkor menjen be a basic settingsbe (ne a login oldalon alljon meg ahol csak egy settings item van)            
+if (global.isdebugversion_showengineselection === true || common.GetParameterInt('enproblem', 0) > 0
+        || (common.GetParameterBool('last_login_failed', false) === true && currGroup === common.StrToInt(common.GROUP_MAIN)))
 {
     html_engineoption = '<li data-icon="carat-d" id="settingitem_chooseengine"><a class="noshadow mlistitem"><div class="sett_text"><span class="sett_display_name">' + stringres.get('sett_chooseengine_title') + '</span><br><span id="sett_comment_engineservice" class="sett_comment">' + stringres.get('sett_chooseengine_comment') + '</span></div></a></li>';
     listview = html_engineoption + listview;
@@ -1699,13 +1758,30 @@ if (global.isdebugversion_showengineselection === true || common.GetParameterInt
     }
     var footer = '<li id="settings_footer"><button id="btn_login" class="ui-btn ui-btn-corner-all ui-btn-b noshadow">' + btnlogintitle + '</button></li>';
 
-    var usrtmp = common.GetParameter('sipusername'); if (common.isNull(usrtmp)) { usrtmp = ''; }
+    var usrtmp = common.GetSipusername(); if (common.isNull(usrtmp)) { usrtmp = ''; }
     var pwdtmp = common.GetParameter('password'); if (common.isNull(pwdtmp)) { pwdtmp = ''; }
+
+    var qrlayout = '';
+    if (common.IsWindowsSoftphone() === true)
+    {
+        var qrcode_login = common.GetParameterInt('qrcode_login', 0);
+        if (qrcode_login == 1)
+        {
+            if (usrtmp.length < 1 || pwdtmp.lenght < 1)
+            {
+                qrlayout = '<li id="qrcode_layout"><button id="btn_qrcode_login" class="ui-btn ui-btn-corner-all ui-btn-b noshadow">' + stringres.get('btn_qrcode') + '</button></li>';
+            }
+        }
+        else if (qrcode_login == 2)
+        {
+            qrlayout = '<li id="qrcode_layout"><button id="btn_qrcode_login" class="ui-btn ui-btn-corner-all ui-btn-b noshadow">' +  stringres.get('btn_qrcode') + '</button></li>';
+        }
+    }
 
     if (currGroup === common.StrToInt(common.GROUP_LOGIN)
             || (usrtmp.length > 0 && pwdtmp.length > 0))
     {
-        listview = listview + footer;
+        listview = listview + qrlayout + footer;
     }
     
     var newuseruri = common.GetParameter('newuser');
@@ -1725,7 +1801,23 @@ if (global.isdebugversion_showengineselection === true || common.GetParameterInt
 
 //--    j$('#settings_footer').off('click');
     
-    var trigerred = false; // handle multiple clicks
+    var trigerredQ = false; // handle multiple clicks
+    j$("#btn_qrcode_login").on("click", function()
+    {
+        if (trigerredQ) { return; }
+    
+        trigerredQ = true;
+        setTimeout(function ()
+        {
+            trigerredQ = false;
+        }, 1000);
+        
+        common.PutToDebugLog(3, 'EVENT, settings button QRcode login clicked');
+        
+        QRcodeLogin();
+    });
+
+    var trigerred = false;
     j$("#btn_login").on("click", function()
     {
         if (trigerred) { return; }
@@ -2297,9 +2389,9 @@ function OnListItemClick (id) // :no return value
 // handle username / sipusername
             else if (mCurrSettName === 'sipusername')
             {
-                if ((common.isNull(mSettValue) || mSettValue.length < 1) && common.GetParameter('username').length > 0)
+                if ((common.isNull(mSettValue) || mSettValue.length < 1)/* && common.GetParameter('username').length > 0*/)
                 {
-                    textBox.value = common.GetParameter('username');
+                    textBox.value = common.GetSipusername();
                 }else
                 {
                     textBox.value = mSettValue;
@@ -2344,12 +2436,12 @@ function OnListItemClick (id) // :no return value
                 if (mCurrSettName === 'sipusername')
                 {
                     mSettValue = common.NormalizeInput(mSettValue, 0);
-                    var callerid = common.GetParameter('username');
+                    /*var callerid = common.GetParameter('username');
                     if (common.isNull(callerid) || callerid.length < 1 ||
                             (!common.isNull(initial_val) && initial_val.length > 0 && initial_val !== mSettValue))
                     {
                         common.SaveParameter("username", mSettValue);
-                    }
+                    }*/
                 }
 
                 if (mCurrSettName === 'loglevel')
@@ -3176,13 +3268,7 @@ function OnListItemClick (id) // :no return value
         
         if (mCurrSettName === 'submenu_sipsettings')
         {
-            currGroup = common.StrToInt( common.Trim(common.GROUP_SIP) );
-            PopulateList();
-            j$('#btn_back_settings').show();
-            j$('#app_name_settings').hide();
-            
-            j$('#settings_page_title').html( settDisplayName );
-            j$('#btn_back_settings').html( '<b>&LT;</b>&nbsp;' + stringres.get("settings_title") );
+            SubmenuSipSettings();
         }
         else if (mCurrSettName === 'submenu_media')
         {
@@ -3682,7 +3768,16 @@ function OnListItemClick (id) // :no return value
             if (!common.isNull(mSettValue) && mSettValue.length > 0 && !common.isNull(textBox))
             {
                var valtmp = mSettValue;
-               if (sdsrv.length > 1) { valtmp = mSettValue.replace(sdsrv, ''); }
+               if (sdsrv.length > 1)
+               {
+                    if (!common.isNull(valtmp) && valtmp.length > 0 && valtmp.indexOf(sdsrv) >= 0)
+                    {
+                        valtmp = valtmp.replace(sdsrv, '');
+                    }else
+                    {
+                        valtmp = '';
+                    }
+               }
                textBox.value = valtmp;
             }
 
@@ -3785,6 +3880,19 @@ function OnListItemClick (id) // :no return value
     }
     
     } catch(err) { common.PutToDebugLogException(2, "_settings: OnListItemClick", err); }
+}
+
+function SubmenuSipSettings()
+{
+    try{
+        currGroup = common.StrToInt( common.Trim(common.GROUP_SIP) );
+        PopulateList();
+        j$('#btn_back_settings').show();
+        j$('#app_name_settings').hide();
+
+        j$('#settings_page_title').html( stringres.get('sett_display_name_submenu_sipsettings') );
+        j$('#btn_back_settings').html( '<b>&LT;</b>&nbsp;' + stringres.get("settings_title") );
+    }catch(err) { common.PutToDebugLogException(2, "_settings: SubmenuSipSettings", err); }
 }
 
 function ManuallyClosePopup(popupelement) // workaround for IE, sometimes popups are not closed simply by clicking the button, so we close it manually
@@ -4222,7 +4330,7 @@ function SaveSettings (usrstart)
         }
 
         //username
-        settValue = common.GetParameter('sipusername');
+        settValue = common.GetSipusername();
         settDisplayName = stringres.get('sett_display_name_sipusername');
         settComment = stringres.get('sett_comment_sipusername');
 
@@ -4262,7 +4370,7 @@ function SaveSettings (usrstart)
         if (common.GetParameterBool('customizedversion', true) !== true)
         {
             //username ; request sipusername even for NOT customized version (used for settings filename)
-            settValue = common.GetParameter('sipusername');
+            settValue = common.GetSipusername();
             settDisplayName = stringres.get('sett_display_name_sipusername');
             settComment = stringres.get('sett_comment_sipusername');
 
@@ -4294,7 +4402,7 @@ function SaveSettings (usrstart)
         {
 
         //username
-            settValue = common.GetParameter('sipusername');
+            settValue = common.GetSipusername();
             settDisplayName = stringres.get('sett_display_name_sipusername');
             settComment = stringres.get('sett_comment_sipusername');
 
@@ -4358,7 +4466,7 @@ function SaveSettings (usrstart)
         //acfile = acfile + acTemp[AC_NAME] + ',' + acTemp[AC_SIPUSERNAME] + ',' + acTemp[AC_SETTFILE] + ',' + acTemp[AC_CHFILE] + ',' + acTemp[AC_ISACTIVE] + '\r\n';
         var acctemp = [];
         
-        var accname = 'Account' + common.GetParameter('sipusername');
+        var accname = 'Account' + common.GetSipusername();
         //accountname+serveraddr+username+salt+password
         var settfilename = common.Md5Hash(accname + common.GetParameter('serveraddress_user') + common.GetParameter('sipusername') + global.SALT + common.GetParameter('password') + common.GetLocationPathName());
         
@@ -4370,7 +4478,7 @@ function SaveSettings (usrstart)
         settfilename = settfilename + extra;
         
         acctemp[common.AC_NAME] = accname;
-        acctemp[common.AC_SIPUSERNAME] = common.GetParameter('sipusername');
+        acctemp[common.AC_SIPUSERNAME] = common.GetSipusername();
         acctemp[common.AC_SETTFILE] = settfilename;
         acctemp[common.AC_CHFILE] = settfilename + '_ch';
         acctemp[common.AC_ISACTIVE] = 'true';
@@ -4444,11 +4552,11 @@ function StartPhone(usrstart)
         if (usrstart === true)
         {
             common.PutToDebugLog(2, 'EVENT, mlogic API_Start _settings StartPhone');
-            webphone_api.start( common.GetParameter('sipusername'), common.GetParameter('password') );
+            webphone_api.start( common.GetSipusername(), common.GetParameter('password') );
         }
 //--        else
 //--        {
-//--            webphone_api.startInner( common.GetParameter('sipusername'), common.GetParameter('password') );
+//--            webphone_api.startInner( common.GetSipusername(), common.GetParameter('password') );
 //--        }
     }, timeout);
     
@@ -4481,7 +4589,7 @@ function StartPhone(usrstart)
 //--        var ret = common.EngineSelect(1);
 //--        common.PutToDebugLog(2, 'EVENT, selected engine: '  + common.TestEngineToString(common.GetSelectedEngine(), false));
 //--        common.PutToDebugLog(2, 'EVENT, recommended engine: ' + common.TestEngineToString(common.GetRecommendedEngine(), false));
-//--        webphone_api.startInner( common.GetParameter('sipusername'), common.GetParameter('password') );
+//--        webphone_api.startInner( common.GetSipusername(), common.GetParameter('password') );
 //--        return;
 //--    }
 //--    //wait for at least 1 second after EngineSelect stage 0 was called
@@ -4495,11 +4603,22 @@ function StartPhone(usrstart)
 //--        var ret = common.EngineSelect(1);
 //--        common.PutToDebugLog(2, 'EVENT, selected engine: '  + common.TestEngineToString(common.GetSelectedEngine(), false));
 //--        common.PutToDebugLog(2, 'EVENT, recommended engine: ' + common.TestEngineToString(common.GetRecommendedEngine(), false));
-//--        webphone_api.startInner( common.GetParameter('sipusername'), common.GetParameter('password') );
+//--        webphone_api.startInner( common.GetSipusername(), common.GetParameter('password') );
 //--        return;
 //--    }, wait);
 //--    } catch(err) { common.PutToDebugLogException(2, "_settings: StartWithEngineSelect", err); }
 //--}
+
+function QRcodeLogin()
+{
+    try{
+        var url = common.AddJscommport(global.WIN_SOFTPHONE_URL) + '?extcmd_qrcode';
+        common.WinSoftphoneHttpReq(url, 'GET', '', function (resp)
+        {
+            common.PutToDebugLog(2, 'EVENT, _settings: extcmd_qrcode response: ' + resp);
+        });
+    } catch(err) { common.PutToDebugLogException(2, "_settings: QRcodeLogin", err); }
+}
 
 function OnNewUserClicked()
 {

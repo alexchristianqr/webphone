@@ -607,6 +607,8 @@ function SaveEditedContact()
     ctTemp[common.CT_ADDRESS] = ctaddress;
     ctTemp[common.CT_NOTES] = ctnotes;
     ctTemp[common.CT_WEBSITE] = ctwebsite;
+    ctTemp[common.CT_LASTACTIVE] = common.GetTickCount().toString();
+    
     
     global.ctlist[ctid] = ctTemp;
     global.wasCtModified = true;
@@ -741,6 +743,7 @@ function SaveNewContact()
     ctTemp[common.CT_ADDRESS] = ctaddress;
     ctTemp[common.CT_NOTES] = ctnotes;
     ctTemp[common.CT_WEBSITE] = ctwebsite;
+    ctTemp[common.CT_LASTACTIVE] = common.GetTickCount().toString();
     
     global.ctlist.push(ctTemp);
     global.wasCtModified = true;
@@ -754,7 +757,7 @@ function SaveNewContact()
     j$.mobile.back();
     return;
     
-    } catch(err) { common.PutToDebugLogException(2, "_addeditcontact: SaveEditedContact", err); }
+    } catch(err) { common.PutToDebugLogException(2, "_addeditcontact: SaveNewContact", err); }
     try{ common.ShowToast(stringres.get('contact_save_error')); j$.mobile.back(); } catch(err2) { ; }
 }
 

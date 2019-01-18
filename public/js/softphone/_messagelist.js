@@ -272,6 +272,8 @@ function OnListItemClick (id) // :no return value
     
 //--    webphone_api.sendchat (1, to, '', action);
 
+    common.PutToDebugLog(4, 'EVENT, _messagelist: OnListItemClick: action: ' + action + '; to: ' + to);
+
     global.intentmsg[0] = 'action=' + action;
     global.intentmsg[1] = 'to=' + to;
     global.intentmsg[2] = 'message=';

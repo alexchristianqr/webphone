@@ -128,7 +128,7 @@ function onCreate (event) // called only once - bind events here
 //--         tunnel should not allow call without server address set (direct call to sip uri)
         if (common.GetParameter('serverinputisupperserver') === 'true')
         {
-            if (common.isNull(common.GetParameter('sipusername')) || common.GetParameter('sipusername').length <= 0 ||
+            if (common.isNull(common.GetSipusername()) || common.GetSipusername().length <= 0 ||
                     common.isNull(common.GetParameter('password')) || common.GetParameter('password').length <= 0 )
 //--                || common.isNull(common.GetParameter('upperserver')) || common.GetParameter('upperserver').length <= 0)
             {
@@ -188,6 +188,11 @@ function onCreate (event) // called only once - bind events here
                 BackSpaceClick();
             }
         }
+        else if ( charCode === 27) // ESC
+        {
+//--            event.preventDefault();
+            j$('#phone_number').val('');
+        }
         else if ( charCode === 13)
         {
 //--            event.preventDefault();
@@ -204,7 +209,7 @@ function onCreate (event) // called only once - bind events here
         }
         } catch(err) { common.PutToDebugLogException(2, "_dialpad: keydown", err); }
 
-    })//--.keyup(function(event)
+    });//--.keyup(function(event)
 //--    {
 //--        try{
 //--        var charCode = (event.keyCode) ? event.keyCode : event.which; // workaround for firefox
@@ -275,14 +280,14 @@ function onCreate (event) // called only once - bind events here
 //--         in this case we have to watch 'upperserver', NOT 'serveraddress_user'
 //--            if (common.GetParameter('serverinputisupperserver') === 'true')
 //--            {
-                if ( common.isNull(common.GetParameter('sipusername')) || common.GetParameter('sipusername').length <= 0
+                if ( common.isNull(common.GetSipusername()) || common.GetSipusername().length <= 0
                     || common.isNull(common.GetParameter('password')) || common.GetParameter('password').length <= 0 )
                 {
                     displaypopup = true;
                 }
 //--            }else
 //--            {
-//--                if ((common.isNull(common.GetParameter('sipusername')) || common.GetParameter('sipusername').length <= 0
+//--                if ((common.isNull(common.GetSipusername()) || common.GetSipusername().length <= 0
 //--                    || common.isNull(common.GetParameter('password')) || common.GetParameter('password').length <= 0))
 //--                {
 //--                    if ((common.isNull(common.GetParameter('serveraddress_user')) || common.GetParameter('serveraddress_user').length <= 0)
@@ -307,6 +312,26 @@ function onCreate (event) // called only once - bind events here
     {
         PutNumber('1');
         
+//-- * webphone_api.onCallStateChange(function (status, direction, peername, peerdisplayname, line, callid)
+//-- * {
+    //-- * console.log('onCallStateChange: ' + status + ',' + direction + ',' + peername + ',' + peerdisplayname + ',' + line + ',' + callid);
+    //-- * alert('onCallStateChange: ' + status + ',' + direction + ',' + peername + ',' + peerdisplayname + ',' + line + ',' + callid);
+//-- * });
+//-- * common.ProcessServiceReqResponse("WPNOTIFICATION,STATUS,1,CallSetup,81020,81013,2,81020 -Pasha John Русский Çağrı Sonrası,0,0,0,100,,[24471702462f35d64ee56984648abea6@172.21.65.58:5061],1,2,1,0,0,0,0,,NEOL", function (){alert('ProcessServiceReqResponse callback');});
+
+        
+//-- * start: int - 1 for start or 0 to stop the playback, -1 to pre-cache
+//-- * file: String - file name or full path
+//-- * looping: int - 1 to repeat, 0 to play once
+//-- * async: boolean - false if no, true if playback should be done in a separate thread (only 0 can be used only for local playback, not for streaming)
+//-- * islocal: boolean - true if the file have to be read from the client PC file system. False if remote file (for example if the file is on the webserver)
+//-- * toremotepeer: boolean - stream the playback to the connected peer
+//-- * line: int -used with toremotepeer if there are multiple calls in progress to specify the call (usually set to -1 for the current call if any)
+//-- * audiodevice: String - you can specify an exact device for playback. Otherwise set it to empty string
+//-- * isring: boolean - whether this sound is a ringtone/ringback
+
+//--webphone_api.playsound(1, 'playsound1.wav',0 , false, false, false, 1, '', false);
+        
 //--        if (global.isdebugversionakos)
 //--        {
 //--            common.UriParser(common.GetParameter('creditrequest'), '', '', '', '', 'creditrequest');
@@ -314,10 +339,11 @@ function onCreate (event) // called only once - bind events here
 //--            var balanceuri = 'http://88.150.183.87:80/mvapireq/?apientry=balance&authkey=1568108345&authid=9999&authmd5=760e4155f1f1c8e614664e20fff73290&authsalt=123456&now=415';
 //--            common.UriParser(balanceuri, '', '', '', '', 'creditrequest');
 //--        }
-        
+       
     });
     j$("#btn_dp_2").on("tap", function()
     {
+//--        webphone_api.playsound(1, 'playsound2.wav',0 , false, false, false, 1, '', false);
         PutNumber('2');
     });
     j$("#btn_dp_3").on("tap", function()
@@ -501,11 +527,19 @@ function onCreate (event) // called only once - bind events here
     } catch(err) { common.PutToDebugLogException(2, "_dialpad: onCreate", err); }
 }
 
+var putnr_lasttick = 0;
 function PutNumber(val)
 {
     try{
     var nrfield = document.getElementById('phone_number');
+    var NOW = common.GetTickCount();
+    if (NOW > 0 && NOW - putnr_lasttick < 100)
+    {
+        return;
+    }
     
+    putnr_lasttick = NOW;
+
     if (j$('#phone_number').is(':focus')) // don't write any characters, if input is focused
     {
         return;
@@ -722,9 +756,6 @@ function StartCall(number, isvideo)
         common.PutToDebugLog(4, 'EVENT, _dialpad initiate call to: ' + number);
         webphone_api.call(number, -1);
     }
-
-//--    j$.mobile.changePage("#page_call", { transition: "pop", role: "page" });
-        
     } catch(err) { common.PutToDebugLogException(2, "_dialpad: StartCall", err); }
 }
 
@@ -971,7 +1002,7 @@ function onStart(event)
     }
     j$("#dialpad_title").attr("title", stringres.get("hint_page"));
     
-    var curruser = common.GetParameter('sipusername');
+    var curruser = common.GetCallerid();
     if (!common.isNull(curruser) && curruser.length > 0) { j$('#curr_user_dialpad').html(curruser); }
 // set status width so it's uses all space to curr_user
     var statwidth = common.GetDeviceWidth() - j$('#curr_user_dialpad').width() - 25;
@@ -1321,6 +1352,7 @@ function GetRecents()
             entry[common.RC_NUMBER] = item[common.CH_NUMBER];
             entry[common.RC_DATE] = item[common.CH_DATE];
             entry[common.RC_RANK] = points;
+            entry[common.RC_DURATION] = item[common.CH_DURATION];;
 
             rectmp.push(entry);
         }
@@ -1488,15 +1520,30 @@ function PopulateListRecents() // :no return value
         /* type 0=outgoing call, 1=incomming call, 2=missed call - not viewed, 3=missed call - viwed*/
         
         var icon = 'icon_call_missed';
+        
+        var durationint = 0;
+        try{
+            durationint = common.StrToInt( common.Trim(item[common.RC_DURATION]) );
+        
+        } catch(errin1) { common.PutToDebugLogException(2, "_dialpad: PopulateListRecents convert duration", errin1); }
 
-        if (item[common.RC_TYPE] === '0') { icon = 'icon_call_outgoing'; }
+        if (item[common.RC_TYPE] === '0')
+        {
+           if (durationint <= 0)
+            {
+                icon = 'icon_call_missed';
+            }else
+            {
+                icon = 'icon_call_outgoing';
+            }
+        }
         if (item[common.RC_TYPE] === '1') { icon = 'icon_call_incoming'; }
         
         var datecallint = 0;
         try{
             datecallint = common.StrToInt( common.Trim(item[common.RC_DATE]) );
         
-        } catch(errin1) { common.PutToDebugLogException(2, "_dialpad: PopulateListRecents convert duration", errin1); }
+        } catch(errin1) { common.PutToDebugLogException(2, "_dialpad: PopulateListRecents convert date of call", errin1); }
         
 //--Aug, 26 2013 10:55
         var datecall = new Date(datecallint);
@@ -1857,7 +1904,7 @@ function RecentMenu(rcid, isrecent, islongclick, popupafterclose)
     } catch(err) { common.PutToDebugLogException(2, "_dialpad: RecentMenu", err); }
 }
 
-function CreateContextmenu(cid_in, cname, cnumber, popupafterclose)
+function CreateContextmenu(cid_in, cname, cnr, popupafterclose)
 {
     try{
     if (common.isNull(cid_in) || cid_in.length < 1 || !common.IsNumber(cid_in))
@@ -1941,7 +1988,7 @@ function CreateContextmenu(cid_in, cname, cnumber, popupafterclose)
     }
 
     var title = cname;
-    if (common.isNull(title) || title.length < 1) { title = cnumber; }
+    if (common.isNull(title) || title.length < 1) { title = cnr; }
     
     var template = '' +
 '<div id="dp_contextmenu" data-role="popup" class="ui-content messagePopup" data-overlay-theme="a" data-theme="a" style="max-width:' + popupWidth + 'px; min-width: ' + Math.floor(popupWidth * 0.6) + 'px;">' +
@@ -2006,21 +2053,21 @@ function CreateContextmenu(cid_in, cname, cnumber, popupafterclose)
             }
             else if (itemid === '#dp_item_call')
             {
-                StartCall(cnumber);
-                common.SaveParameter("redial", cnumber);
+                StartCall(cnr);
+                common.SaveParameter("redial", cnr);
             }
             else if (itemid === '#dp_item_video_call')
             {
-                common.SaveParameter("redial", cnumber);
-                webphone_api.videocall(cnumber);
+                common.SaveParameter("redial", cnr);
+                webphone_api.videocall(cnr);
             }
             else if (itemid === '#dp_item_message')
             {
-                common.StartMsg(cnumber, '', '_dialpad');
+                common.StartMsg(cnr, '', '_dialpad');
             }
             else if (itemid === '#dp_item_filetransf')
             {
-                common.FileTransfer(cnumber);
+                common.FileTransfer(cnr);
             }
             else if (itemid === '#dp_item_favorite')
             {

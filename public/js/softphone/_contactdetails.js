@@ -107,6 +107,7 @@ function onStart(event)
         contact[common.CT_ADDRESS] = '';
         contact[common.CT_NOTES] = '';
         contact[common.CT_WEBSITE] = '';
+        contact[common.CT_LASTACTIVE] = '0';
     }
     
     PopulateData();
@@ -534,13 +535,6 @@ function OnItemClick(contactid, type) // type: 0=call, 1=chat, 2=video call
             return;
         }
         j$.mobile.back();
-
-//--        setTimeout(function ()
-//--        {
-//--            j$.mobile.changePage("#page_call", { transition: "pop", role: "page" });
-//--        }, 20);
-
-//--        j$.mobile.changePage("#page_call", { transition: "pop", role: "page" });
     }
     else if (type === 1)
     {

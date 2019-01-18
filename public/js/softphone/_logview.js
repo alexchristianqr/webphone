@@ -186,7 +186,7 @@ function onStart(event)
         
         if (common.isNull(logfilename) || logfilename.length < 1)
         {
-            logfilename = common.GetParameter('sipusername');
+            logfilename = common.GetSipusername();
             if (!common.isNull(common.GetParameter('brandname'))) { logfilename = logfilename + '_' + encodeURIComponent(common.GetParameter('brandname')); }
             if (!common.isNull(srv)) { logfilename = logfilename + '_' + encodeURIComponent(srv); }
         }

@@ -228,6 +228,14 @@ function onStart(event)
     
     j$("#msgpick_input").attr("placeholder", stringres.get("chat_nr"));
     
+    j$('#msgpick_input').keyup(function()
+    {
+        HandleChatSms();
+    });
+    j$('#msgpick_input').on('input',function(e){
+        HandleChatSms();
+    });             
+    
 // set focus on destination or message compose area
     setTimeout(function ()
     {
@@ -246,6 +254,44 @@ function onStart(event)
     } catch(err) { common.PutToDebugLogException(2, "_message: onStart", err); }
 }
 
+// decice whether is chat or sms, based on input number
+function HandleChatSms()
+{
+    try{
+//--  !!!NOT NEEDED        if (common.GetParameterBool('customizedversion', true) === false) { return; }
+        
+        var sms = common.GetParameter('sms');
+        if (common.isNull(sms) || sms.length < 3) { return; }
+
+        var chatsms = common.GetParameter('chatsms');
+        var nr = j$("#msgpick_input").val();
+        if (common.isNull(nr) || common.Trim(nr).length < 1) { return; }
+        nr = common.Trim(nr);
+
+
+        if (chatsms !== '1' && chatsms !== '2') // if (chatsms === '0') // Ask / Automatic !!!! Treat as automatic (Istvan)
+        {
+            var tmpNumber = nr;
+            if (tmpNumber.indexOf('+') >= 0) { tmpNumber = tmpNumber.substring(tmpNumber.indexOf('+') + 1, tmpNumber.length); }
+
+            //if (!tmpNumber.match('^[0-9 ]{6,20}$'))
+            if (common.IsNumber(tmpNumber) && tmpNumber.length > 6 && tmpNumber.length < 20)
+            {
+                mAction = 'sms';
+                document.getElementById('msg_title').innerHTML = stringres.get("msg_title_sms");
+            }else
+            {
+                mAction = 'chat';
+                document.getElementById('msg_title').innerHTML = stringres.get("msg_title_chat");
+
+//          This was used for "Ask"
+//                    PutToDebugLog(4, 'EVENT, StartMsg called action: ' + action + '; number: ' + number + '; fromclass: ' + fromclass + ' (4)');
+//                    ChooseChatOrSms(number, msg);
+            }
+        }
+    } catch(err) { common.PutToDebugLogException(2, "_message: HandleChatSms", err); }
+}
+
 function MeasureMessage() // resolve window height size change
 {
     try{
@@ -259,7 +305,7 @@ function MeasureMessage() // resolve window height size change
         heightTemp = heightTemp - j$("#msgpick_container").height();
     }
     
-    var curruser = common.GetParameter('sipusername');
+    var curruser = common.GetCallerid();
     if (!common.isNull(curruser) && curruser.length > 0) { j$('#curr_user_message').html(curruser); }
 // set status width so it's uses all space to curr_user
     var statwidth = common.GetDeviceWidth() - j$('#curr_user_message').width() - 25;
@@ -284,7 +330,7 @@ function LoadMessage()
         
         // filenames: sms/chat_username_number
     
-        var currfile = mAction + '_' + common.GetParameter('sipusername') + '_' + mTo;
+        var currfile = mAction + '_' + common.GetSipusername() + '_' + mTo;
         
         global.File.ReadFile(currfile, global.STORAGE_LOCAL, function (content)
         {
@@ -435,7 +481,7 @@ function RemoveNotification() // remove new message notification (number) from f
         msglist = files.split(',');
     }
 
-    var currfile = mAction + '_' + common.GetParameter('sipusername') + '_' + mTo + '[#';
+    var currfile = mAction + '_' + common.GetSipusername() + '_' + mTo + '[#';
         
     for (var i = 0; i < msglist.length; i++)
     {
@@ -470,6 +516,7 @@ function PickContactResult(number)
     try{
     document.getElementById('msgpick_input').value = number;
     j$("#msg_textarea").focus();
+    HandleChatSms();
     
     } catch(err) { common.PutToDebugLogException(2, "_message: PickContactResult", err); }
 }
@@ -600,10 +647,10 @@ function SendAction(to, msg) // actually send the message
     try{
     if (mAction === 'sms')
     {
-        common.PutToDebugLog(5,"EVENT, _message SendMessage to: " + mTo + '; message: ' + mMessage);
+        common.PutToDebugLog(5,"EVENT, _message SMS SendMessage to: " + mTo + '; message: ' + mMessage);
 
         var toLocal = common.Trim(mTo);
-        var msgLocal = common.Trim(mMessage);
+        var msgLocal = common.StripXML(mMessage);
         
     // handle groupchat
         if (mTo.indexOf(',') > 0)
@@ -622,14 +669,14 @@ function SendAction(to, msg) // actually send the message
                     chatwith = chatwith.replace(dstlist[i], '');
                     chatwith = '[' + stringres.get('gc_message') + ': ' + chatwith + ']';
                     
-                    common.UriParser(common.GetParameter('sms'), '', common.GetParameter('sipusername'), common.Trim(dstlist[i]), chatwith, 'sendsms');
+                    common.UriParser(common.GetParameter('sms'), '', common.GetSipusername(), common.Trim(dstlist[i]), chatwith, 'sendsms');
                 }
                 
-                common.UriParser(common.GetParameter('sms'), '', common.GetParameter('sipusername'), common.Trim(dstlist[i]), msgLocal, 'sendsms');
+                common.UriParser(common.GetParameter('sms'), '', common.GetSipusername(), common.Trim(dstlist[i]), msgLocal, 'sendsms');
             }
         }else
         {
-            common.UriParser(common.GetParameter('sms'), '', common.GetParameter('sipusername'), toLocal, msgLocal, 'sendsms');
+            common.UriParser(common.GetParameter('sms'), '', common.GetSipusername(), toLocal, msgLocal, 'sendsms');
         }
 
         msgSent = true;
@@ -789,7 +836,7 @@ function AddMessage(sentStatus, isincoming)
         return;
     }
     
-    var currfile = mAction + '_' + common.GetParameter('sipusername') + '_' + mTo;
+    var currfile = mAction + '_' + common.GetSipusername() + '_' + mTo;
     
     var files = common.GetParameter('messagefiles');
     var msglist = [];
@@ -930,7 +977,7 @@ function SaveMissedIncomingMessage(action, from, name, msg)
         return;
     }
     
-    var currfile = action + '_' + common.GetParameter('sipusername') + '_' + from;
+    var currfile = action + '_' + common.GetSipusername() + '_' + from;
     
     var files = common.GetParameter('messagefiles');
     var msglist = [];
@@ -1068,7 +1115,7 @@ function ShowIncomingMessage(action, from, msg)
                 
                 if (mAction === 'sms')
                 {
-                    common.UriParser(common.GetParameter('sms'), '', common.GetParameter('sipusername'), common.Trim(dstlist[i]), msg, 'sendsms');
+                    common.UriParser(common.GetParameter('sms'), '', common.GetSipusername(), common.Trim(dstlist[i]), msg, 'sendsms');
                 }else
                 {
                     webphone_api.sendchat(common.Trim(dstlist[i]), msg, 1);
@@ -1262,7 +1309,7 @@ function ClearHistory(popupafterclose)
         {
             j$(this).off( 'popupafterclose' );
         
-            var currfile = mAction + '_' + common.GetParameter('sipusername') + '_' + mTo;
+            var currfile = mAction + '_' + common.GetSipusername() + '_' + mTo;
             var msglist = files.split(',');
 
             for (var i = 0; i < msglist.length; i++)
@@ -1505,6 +1552,8 @@ function onStop(event)
     mMessage = '';
     mContent = '';
     placeholderhidden = false;
+    
+    j$('#msgpick_input').off('input');
     
     common.SaveContactsFile(function (issaved) { common.PutToDebugLog(4, 'EVENT, _message: onDestroy SaveContactsFile: ' + issaved.toString()); });
 

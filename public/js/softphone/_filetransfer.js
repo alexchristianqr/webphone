@@ -185,7 +185,7 @@ function FileTransferOnSubmit(directory, filename)
     
 // send chat to destination
     var ahref = '<a href="' + transferpath + '" target="_blank" >' + NormalizeFilename(filename) + '</a>';
-    var msg = '[DONT_START_CHAT_WINDOW]' + common.GetParameter('sipusername') + ' ' + stringres.get('fitransf_chat') + ': ' + ahref;
+    var msg = '[DONT_START_CHAT_WINDOW]' + common.GetSipusername() + ' ' + stringres.get('fitransf_chat') + ': ' + ahref;
     
     var to = common.Trim(document.getElementById('filetransfpick_input').value);
     

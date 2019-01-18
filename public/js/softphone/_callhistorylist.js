@@ -121,7 +121,7 @@ function onStart(event)
     }
     j$("#chlist_title").attr("title", stringres.get("hint_page"));
     
-    var curruser = common.GetParameter('sipusername');
+    var curruser = common.GetCallerid();
     if (!common.isNull(curruser) && curruser.length > 0) { j$('#curr_user_callhistorylist').html(curruser); }
 // set status width so it's uses all space to curr_user
     var statwidth = common.GetDeviceWidth() - j$('#curr_user_callhistorylist').width() - 25;
@@ -325,8 +325,22 @@ function PopulateList() // :no return value
         else if (global.callhistoryfilter === 1 && item[common.CH_TYPE] !== '1') { continue; }
         else if (global.callhistoryfilter === 2 && (item[common.CH_TYPE] !== '2' && item[common.CH_TYPE] !== '3')) { continue; }
             
+        var durationint = 0;
+        try{
+            durationint = common.StrToInt( common.Trim(item[common.CH_DURATION]) );
         
-        if (item[common.CH_TYPE] === '0') { icon = 'icon_call_outgoing'; }
+        } catch(errin1) { common.PutToDebugLogException(2, "_callhistorylist: PopulateList convert duration", errin1); }
+        
+        if (item[common.CH_TYPE] === '0')
+        {
+            if (durationint <= 0)
+            {
+                icon = 'icon_call_missed';
+            }else
+            {
+                icon = 'icon_call_outgoing';
+            }
+        }
         if (item[common.CH_TYPE] === '1') { icon = 'icon_call_incoming'; }
         
         if (item[common.CH_TYPE] === '2')
@@ -340,12 +354,6 @@ function PopulateList() // :no return value
         var datecallint = 0;
         try{
             datecallint = common.StrToInt( common.Trim(item[common.CH_DATE]) );
-        
-        } catch(errin1) { common.PutToDebugLogException(2, "_callhistorylist: PopulateList convert duration", errin1); }
-        
-        var durationint = 0;
-        try{
-            durationint = common.StrToInt( common.Trim(item[common.CH_DURATION]) );
         
         } catch(errin1) { common.PutToDebugLogException(2, "_callhistorylist: PopulateList convert duration", errin1); }
 

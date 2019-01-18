@@ -22,6 +22,8 @@ btn_quickcall: 'Call',
 btn_accept: 'Accept',
 btn_reject: 'Reject',
 btn_download: 'Download',
+btn_decline: 'Decline',
+btn_qrcode: 'QR code login',
 
 myprovider: 'Home',
 myaccount: 'My account',
@@ -159,6 +161,8 @@ ct_menu_error: 'This contact has no numbers or SIP URIs',
 switch_conf: 'Switching engine for Conference',
 switch_conf_title: 'Use conference',
 switch_confmessage: 'To use the conference you need to install NS -Service Plugin. Just click OK to continue.',
+fcm_perm_message: 'Permission for Push Notifications is denied',
+barcode_success: 'QR code read successfully',
 
 autoprov_loading: 'Retrieving configuration...',
 autoprov_restart: 'Applying configuration...',
@@ -254,6 +258,7 @@ menu_import_google: 'Import from Google',
 menu_import_android: 'Import from Android phone',
 menu_export_file: 'Export to File (Backup)',
 
+menu_sortct: 'Sort contacts',
 menu_volumehide: 'Hide volume controls',
 menu_volumeshow: 'Volume controls',
 menu_audiodevicehide: 'Hide audio device',
@@ -305,7 +310,10 @@ help_sendlog: 'View logs / Send to support',
 help_stoplog: 'Stop collecting logs',
 about_license: 'License agreement',
 
-
+ct_sort_name: 'By name',
+ct_sort_importance: 'By importance',
+ct_sort_status: 'By status',
+ct_sort_title: 'Sort contacts',
 btn_activate: 'Activate',
 license_key: 'License key',
 enter_license_key: 'Enter license key',
@@ -463,10 +471,12 @@ logview_msg: 'The page may not be available for a few seconds. Reload the page i
 messagepl: 'Compose',
 unlockadvancedsett_title: 'Unlock Settings',
 unlockadvancedsett_msg: 'Enter password to unlock advanced settings',
-warning_notreg: 'Cannot initiate call, because not yet registered',
-warning_notstarted: 'Cannot initiate call, because phone not started yet',
+warning_notreg: 'Cannot initiate call because not yet registered',
+warning_notstarted: 'Cannot initiate call because phone not started yet',
 log_description: 'Describe the problem shortly.',
 log_desc_error: 'Not sent! Description is mandatory.',
+ac_showadvanced: 'Show advanced login settings',
+ac_hideadvanced: 'Hide advanced login settings',
 
 request_permission: 'Waiting for permission. Please push the Allow/Share button in your browser. Click on the webrtc/microphone/camera/red icon if you do not see the dialog.',
 warning_msg_1: 'Only direct calls to SIP URIs will be possible if the VoIP Server address is not set',
@@ -498,9 +508,10 @@ err_msg_21: 'Enter your phone number.',
 err_msg_22: 'Cannot retrieve configuration. Try again later.',
 
 err_nocallinprogress: 'No call in progress',
+err_nocallinprogress2: 'No incoming call while trying to accept',
 err_flash_local: 'Flash engine will work only if launched from a webserver, not from local file system',
 
-srvaddr_help: 'VoIP service provider server address (ip address or domain name or DNS SRV record). You can also suffix a port number if the server is not on the default SIP port (5060). Example: yourserver.com:6000<br /><br /> In case if you are new to VoIP:<br /> Unlike some other popular software such as Skype, if you are using standard SIP protocol you can use any VoIP provider. There are a hundreds of such kind of services and you could also setup your own server, for example using Mizu server or Asterisk.<br /> Internal (softphone to softphone) calls are usually free and the cost of outbound calls (calls to mobile or landline) are usually cheaper than for traditional providers, especially international calls.<br /> There are also a lot of other benefits in using standard VoIP such as high call quality (with wideband codec), freedom (you can switch your provider at any time), control (you can easily manage your account) and flexibility (lots of extra services such as call recording, conferencing and others). You can even use multiple providers (for example you can always use the cheaper one for your call targets).<br /> If you don\'t have a VoIP account yet then you can create one within a few minutes at any provider and start using VoIP right now: http://www.voip-info.org/wiki/view/Sip+Phone+Service+Providers',
+srvaddr_help: 'VoIP service provider server address (ip address or domain name or DNS SRV record). You can also suffix a port number if the server is not on the default SIP port (5060). Example: yourserver.com:6000<br /><br /> In case if you are new to VoIP:<br /> Unlike some other popular software such as Skype, if you are using standard SIP protocol you can use any VoIP provider. There are a hundreds of such kind of services and you could also setup your own server, for example using Mizu server or Asterisk.<br /> Internal (softphone to softphone) calls are usually free and the cost of outbound calls (calls to mobile or landline) are usually cheaper than for traditional providers, especially international calls.<br /> There are also a lot of other benefits in using standard VoIP such as high call quality (with wideband codec), freedom (you can switch your provider at any time), control (you can easily manage your account) and flexibility (lots of extra services such as call recording, conferencing and others). You can even use multiple providers (for example you can always use the cheaper one for your call targets).<br /> If you don\'t have a VoIP account yet then you can create one within a few minutes at any provider and start using VoIP right now: https://www.voip-info.org/wiki/view/Sip+Phone+Service+Providers',
 
 dtmfmode_op_0: 'Disabled',
 dtmfmode_op_1: 'SIP INFO method',
@@ -509,7 +520,15 @@ dtmfmode_op_3: 'INFO + NTE',
 dtmfmode_op_4: 'NTE (Named Telephone Events as specified in RFC2833 and RFC 4733)',
 dtmfmode_op_5: 'In-Band (DTMF audio tones in the RTP stream)',
 dtmfmode_op_6: 'INFO + InBand',
-chatsms__auto_guess_or_ask: 'Auto guess or Ask',
+enableblf__no: 'No',
+enableblf__auto: 'Auto',
+enableblf__always: 'Always',
+enableblf__must: 'Force',
+dropsameoldcall__no: 'No',
+dropsameoldcall__requested: 'When reqested (if sip header received)',
+dropsameoldcall__reqvideo: 'Yes when requested and video',
+dropsameoldcall__forall: 'Yes-for all calls',
+chatsms__auto_guess_or_ask: 'Auto guess',
 chatsms__sms_only: 'SMS only',
 chatsms__chat_only: 'Chat only',
 defmute__both: 'Both',
@@ -639,6 +658,15 @@ holdtype__notused: 'Not used',
 holdtype__hold: 'Hold',
 holdtype__otherparty: 'Other party hold',
 holdtype__both: 'Both in hold',
+pushnotifications__auto: 'Auto',
+pushnotifications__no: 'No',
+pushnotifications__yes: 'Yes',
+pushnotifications__yesauto: 'Yes - Autodetect',
+pushnotifications__yesdirect: 'Yes - Direct',
+pushnotifications__yesgateway: 'Yes - Gateway',
+backgroundcalls__auto: 'Auto',
+backgroundcalls__no: 'No',
+backgroundcalls__yes: 'Yes',
 normalizenumber__no: 'No',
 normalizenumber__yes: 'Yes',
 savetocontacts__no: 'No',
@@ -720,6 +748,10 @@ sett_display_name_alwaysallowlowcodec: 'Allow narrowband codec',
 sett_comment_alwaysallowlowcodec: 'Always enable basic narrowband codec',
 sett_comment_short_alwaysallowlowcodec: '',
 
+sett_display_name_dropsameoldcall: 'Drop same old call',
+sett_comment_dropsameoldcall: 'Drop call if same call is received multiple times',
+sett_comment_short_dropsameoldcall: '',
+
 sett_display_name_dtmfmode: 'DTMF',
 sett_comment_dtmfmode: 'Choose DTMF (tone dialing) send method',
 sett_comment_short_dtmfmode: '',
@@ -800,6 +832,10 @@ sett_display_name_calltimeout: 'Call timeout',
 sett_comment_calltimeout: 'Maximum speech time allowed in seconds. Default is 10800 seconds which means 3 hours',
 sett_comment_short_calltimeout: '',
 
+sett_display_name_enableblf: 'BLF',
+sett_comment_enableblf: 'Busy Lamp Field',
+sett_comment_short_enableblf: '',
+
 sett_display_name_username: 'Caller ID',
 sett_comment_username: 'This will not be used for authentication. Specify your User or extension ID here if not the same as Username for authentication setting. Some VoIP servers will reject if not the same with the username!',
 sett_comment_short_username: 'You might set a different username here used for A number display',
@@ -848,6 +884,10 @@ sett_comment_short_callforwardonbusy: '',
 sett_display_name_callforwardonnoanswer: 'Call forward no answer',
 sett_comment_callforwardonnoanswer: 'Set call forward number calls should be forwarded if no answer',
 sett_comment_short_callforwardonnoanswer: '',
+
+sett_display_name_callforwardonnoanswertimeout: 'Call forward no answer timeout',
+sett_comment_callforwardonnoanswertimeout: 'Delay in seconds before call is forwarded on no answer',
+sett_comment_short_callforwardonnoanswertimeout: '',
 
 sett_display_name_callforwardalways: 'Call forward always',
 sett_comment_callforwardalways: 'Set call forward number where all calls should be forwarded',
@@ -998,6 +1038,10 @@ sett_comment_short_accounts: '',
 sett_display_name_extraoption: 'Extra options',
 sett_comment_extraoption: 'Set any custom parameters in a key-value pair list, separated by semicolon.<br />Ex: displayname=John;',
 sett_comment_short_extraoption: 'Set any custom parameters',
+
+sett_display_name_pushnotifications: 'Enable background calls',
+sett_comment_pushnotifications: 'Listen for incoming calls also when the webphone is not opened',
+sett_comment_short_pushnotifications: '',
 
 sett_display_name_reset_settings: 'Reset settings',
 sett_comment_reset_settings: 'Reset settings to their default values',
@@ -1299,6 +1343,10 @@ sett_display_name_sscontrol: 'Control ',
 sett_comment_sscontrol: 'Allow remote control for screen sharing (otherwise view only)',
 sett_comment_short_sscontrol: '',
 
+sett_display_name_icetimeout: 'ICE timeout ',
+sett_comment_icetimeout: 'Set ICE timeout in milliseconds',
+sett_comment_short_icetimeout: '',
+
 sett_display_name_ssscroll: 'Scroll',
 sett_comment_ssscroll: 'Allow screen sharing window scroll controls',
 sett_comment_short_ssscroll: '',
@@ -1389,10 +1437,10 @@ help_text_custom: '> How to use ?' +
 'VoIP means "Voice over Internet Protocol", a few protocols to allow voice calls to be made over IP networks.' +
 'SIP is the newest VoIP standard adopted by many organizations for their telecom infrastructure. By using the open standard SIP protocols you can keep yourself free of locked-in solutions such as Skype and you are free to use any standard based network for your telecom needs.' +
 'More details: ' +
-'<a href="http://en.wikipedia.org/wiki/Voice_over_IP" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://en.wikipedia.org/wiki/Voice_over_IP\')">http://en.wikipedia.org/wiki/Voice_over_IP</a>' +
+'<a href="https://en.wikipedia.org/wiki/Voice_over_IP" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://en.wikipedia.org/wiki/Voice_over_IP\')">https://en.wikipedia.org/wiki/Voice_over_IP</a>' +
 '<br /><br />' +
-'<a href="http://en.wikipedia.org/wiki/Session_Initiation_Protocol" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://en.wikipedia.org/wiki/Session_Initiation_Protocol\')">http://en.wikipedia.org/wiki/Session_Initiation_Protocol</a>' +
-'<a href="http://www.voip-info.org/" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://www.voip-info.org\')">http://www.voip-info.org/</a>' +
+'<a href="https://en.wikipedia.org/wiki/Session_Initiation_Protocol" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://en.wikipedia.org/wiki/Session_Initiation_Protocol\')">https://en.wikipedia.org/wiki/Session_Initiation_Protocol</a>' +
+'<a href="https://www.voip-info.org/" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://www.voip-info.org\')">https://www.voip-info.org/</a>' +
 '<br /><br />' +
 'You can make VoIP calls in the following ways:' +
 '-direct IP to IP calls (this can be done by [BRANDNAME] by typing the peer full URI)' +
@@ -1450,10 +1498,10 @@ help_text: '> How to use ?' +
 'VoIP means "Voice over Internet Protocol", a few protocols to allow voice calls to be made over IP networks.' +
 'SIP is the newest VoIP standard adopted by many organizations for their telecom infrastructure. By using the open standard SIP protocols you can keep yourself free of locked-in solutions such as Skype and you are free to use any standard based network for your telecom needs.' +
 'More details: ' +
-'<a href="http://en.wikipedia.org/wiki/Voice_over_IP" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://en.wikipedia.org/wiki/Voice_over_IP\')">http://en.wikipedia.org/wiki/Voice_over_IP</a>' +
+'<a href="https://en.wikipedia.org/wiki/Voice_over_IP" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://en.wikipedia.org/wiki/Voice_over_IP\')">https://en.wikipedia.org/wiki/Voice_over_IP</a>' +
 '<br /><br />' +
-'<a href="http://en.wikipedia.org/wiki/Session_Initiation_Protocol" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://en.wikipedia.org/wiki/Session_Initiation_Protocol\')">http://en.wikipedia.org/wiki/Session_Initiation_Protocol</a>' +
-'<a href="http://www.voip-info.org/" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://www.voip-info.org\')">http://www.voip-info.org/</a>' +
+'<a href="https://en.wikipedia.org/wiki/Session_Initiation_Protocol" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://en.wikipedia.org/wiki/Session_Initiation_Protocol\')">https://en.wikipedia.org/wiki/Session_Initiation_Protocol</a>' +
+'<a href="https://www.voip-info.org/" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://www.voip-info.org\')">https://www.voip-info.org/</a>' +
 '<br /><br />' +
 'You can make VoIP calls in the following ways:' +
 '-direct IP to IP calls (this can be done by [BRANDNAME] by typing the peer full URI)' +
@@ -1491,7 +1539,7 @@ help_text: '> How to use ?' +
 '> Contact us' +
 '<br /><br />' +
 '' +
-'<a href="http://www.mizu-voip.com" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://www.mizu-voip.com\')">http://www.mizu-voip.com</a><br />' +
+'<a href="https://www.mizu-voip.com" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://www.mizu-voip.com\')">https://www.mizu-voip.com</a><br />' +
 'general/commercial: <a href="mailto:info@mizu-voip.com">info@mizu-voip.com</a><br />' +
 'technical support: <a href="mailto:webphone@mizu-voip.com"webphone@mizu-voip.comm</a>',
 
@@ -1519,8 +1567,8 @@ dlg_about_msg: "This SOFTWARE is licensed, not sold.<br />" +
 "Title, ownership rights, and intellectual property rights in the Software shall remain with [COMPANY] and/or its suppliers.<br />" +
 "This Agreement and the license granted hereunder will terminate automatically if you fail to comply with the limitations described herein. Upon termination, you must destroy all copies of the Software.<br />" +
 "This software contains some modules distributed with LGPL or modified BSD license:<br />" +
-"	-speex: http://www.speex.org <br />" +
-"	-iLBC: http://www.ilbcfreeware.org <br /><br />" +
+"	-speex: https://www.speex.org <br />" +
+"	-iLBC: https://www.ilbcfreeware.org <br /><br />" +
 
 "THE SOFTWARE IS PROVIDED \"AS IS\" WITHOUT ANY WARRANTY OF ANY KIND.<br />" +
 "[COMPANY] and its suppliers specifically disclaim any express or implied warranty of fitness for High Risk Activities.<br /><br />" +
@@ -1852,7 +1900,7 @@ err_msg_22_hu: 'Beállitások lekérdezése sikertelen. Később próbálkozz ú
 err_nocallinprogress_hu: 'Nincs hivás folyamatban',
 err_flash_local_hu: 'A Flash engine csak akkor fog müködni, ha webszerverről lesz futtatva, nem lokális file systemről',
 
-srvaddr_help_hu: 'VoIP service provider server address (ip address or domain name or DNS SRV record). You can also suffix a port number if the server is not on the default SIP port (5060). Example: yourserver.com:6000<br /><br /> In case if you are new to VoIP:<br /> Unlike some other popular software such as Skype, if you are using standard SIP protocol you can use any VoIP provider. There are a hundreds of such kind of services and you could also setup your own server, for example using Mizu server or Asterisk.<br /> Internal (softphone to softphone) calls are usually free and the cost of outbound calls (calls to mobile or landline) are usually cheaper than for traditional providers, especially international calls.<br /> There are also a lot of other benefits in using standard VoIP such as high call quality (with wideband codec), freedom (you can switch your provider at any time), control (you can easily manage your account) and flexibility (lots of extra services such as call recording, conferencing and others). You can even use multiple providers (for example you can always use the cheaper one for your call targets).<br /> If you don\'t have a VoIP account yet then you can create one within a few minutes at any provider and start using VoIP right now: http://www.voip-info.org/wiki/view/Sip+Phone+Service+Providers',
+srvaddr_help_hu: 'VoIP service provider server address (ip address or domain name or DNS SRV record). You can also suffix a port number if the server is not on the default SIP port (5060). Example: yourserver.com:6000<br /><br /> In case if you are new to VoIP:<br /> Unlike some other popular software such as Skype, if you are using standard SIP protocol you can use any VoIP provider. There are a hundreds of such kind of services and you could also setup your own server, for example using Mizu server or Asterisk.<br /> Internal (softphone to softphone) calls are usually free and the cost of outbound calls (calls to mobile or landline) are usually cheaper than for traditional providers, especially international calls.<br /> There are also a lot of other benefits in using standard VoIP such as high call quality (with wideband codec), freedom (you can switch your provider at any time), control (you can easily manage your account) and flexibility (lots of extra services such as call recording, conferencing and others). You can even use multiple providers (for example you can always use the cheaper one for your call targets).<br /> If you don\'t have a VoIP account yet then you can create one within a few minutes at any provider and start using VoIP right now: https://www.voip-info.org/wiki/view/Sip+Phone+Service+Providers',
 
 
 sett_display_name_serveraddress_user_hu: 'Szerver',
@@ -2424,8 +2472,8 @@ proversion_content_text_hu: 'Upgrade to Softphone Pro<br /><br />' +
 '<br />' +
 'Contact <a href="mailto:webphone@mizu-voip.com">webphone@mizu-voip.com</a> for any help<br />' +
 'Please use the Mizutech Android Forum (under the Support menu) for any questions, bug reports or suggestions<br />' +
-'Company home page: <a href="http://www.mizu-voip.com" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://www.mizu-voip.com\')">http://www.mizu-voip.com</a> for more info.<br />' +
-'Software home page: <a href="http://www.mizu-voip.com/Products/MobileSoftphones/AndroidSoftphone.aspx<br />" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://www.mizu-voip.com/Products/MobileSoftphones/AndroidSoftphone.aspx<br />\')">http://www.mizu-voip.com/Products/MobileSoftphones/AndroidSoftphone.aspx<br /></a>' +
+'Company home page: <a href="https://www.mizu-voip.com" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://www.mizu-voip.com\')">https://www.mizu-voip.com</a> for more info.<br />' +
+'Software home page: <a href="https://www.mizu-voip.com/Products/MobileSoftphones/AndroidSoftphone.aspx<br />" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://www.mizu-voip.com/Products/MobileSoftphones/AndroidSoftphone.aspx<br />\')">https://www.mizu-voip.com/Products/MobileSoftphones/AndroidSoftphone.aspx<br /></a>' +
 'Copyright (C) Mizutech SRL.',
 
 help_text_custom_hu: '> How to use ?' +
@@ -2456,10 +2504,10 @@ help_text_custom_hu: '> How to use ?' +
 'VoIP means "Voice over Internet Protocol", a few protocols to allow voice calls to be made over IP networks.' +
 'SIP is the newest VoIP standard adopted by many organizations for their telecom infrastructure. By using the open standard SIP protocols you can keep yourself free of locked-in solutions such as Skype and you are free to use any standard based network for your telecom needs.' +
 'More details: ' +
-'<a href="http://en.wikipedia.org/wiki/Voice_over_IP" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://en.wikipedia.org/wiki/Voice_over_IP\')">http://en.wikipedia.org/wiki/Voice_over_IP</a>' +
+'<a href="https://en.wikipedia.org/wiki/Voice_over_IP" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://en.wikipedia.org/wiki/Voice_over_IP\')">https://en.wikipedia.org/wiki/Voice_over_IP</a>' +
 '<br /><br />' +
-'<a href="http://en.wikipedia.org/wiki/Session_Initiation_Protocol" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://en.wikipedia.org/wiki/Session_Initiation_Protocol\')">http://en.wikipedia.org/wiki/Session_Initiation_Protocol</a>' +
-'<a href="http://www.voip-info.org/" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://www.voip-info.org\')">http://www.voip-info.org/</a>' +
+'<a href="https://en.wikipedia.org/wiki/Session_Initiation_Protocol" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://en.wikipedia.org/wiki/Session_Initiation_Protocol\')">https://en.wikipedia.org/wiki/Session_Initiation_Protocol</a>' +
+'<a href="https://www.voip-info.org/" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://www.voip-info.org\')">https://www.voip-info.org/</a>' +
 '<br /><br />' +
 'You can make VoIP calls in the following ways: ' +
 '-direct IP to IP calls (this can be done by [BRANDNAME] by typing the peer full URI)' +
@@ -2517,10 +2565,10 @@ help_text_hu: '> How to use ?' +
 'VoIP means "Voice over Internet Protocol", a few protocols to allow voice calls to be made over IP networks.' +
 'SIP is the newest VoIP standard adopted by many organizations for their telecom infrastructure. By using the open standard SIP protocols you can keep yourself free of locked-in solutions such as Skype and you are free to use any standard based network for your telecom needs.' +
 'More details: ' +
-'<a href="http://en.wikipedia.org/wiki/Voice_over_IP" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://en.wikipedia.org/wiki/Voice_over_IP\')">http://en.wikipedia.org/wiki/Voice_over_IP</a>' +
+'<a href="https://en.wikipedia.org/wiki/Voice_over_IP" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://en.wikipedia.org/wiki/Voice_over_IP\')">https://en.wikipedia.org/wiki/Voice_over_IP</a>' +
 '<br /><br />' +
-'<a href="http://en.wikipedia.org/wiki/Session_Initiation_Protocol" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://en.wikipedia.org/wiki/Session_Initiation_Protocol\')">http://en.wikipedia.org/wiki/Session_Initiation_Protocol</a>' +
-'<a href="http://www.voip-info.org/" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://www.voip-info.org\')">http://www.voip-info.org/</a>' +
+'<a href="https://en.wikipedia.org/wiki/Session_Initiation_Protocol" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://en.wikipedia.org/wiki/Session_Initiation_Protocol\')">https://en.wikipedia.org/wiki/Session_Initiation_Protocol</a>' +
+'<a href="https://www.voip-info.org/" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://www.voip-info.org\')">https://www.voip-info.org/</a>' +
 '<br /><br />' +
 'You can make VoIP calls in the following ways: ' +
 '-direct IP to IP calls (this can be done by [BRANDNAME] by typing the peer full URI)' +
@@ -2558,7 +2606,7 @@ help_text_hu: '> How to use ?' +
 '> Contact us' +
 '<br /><br />' +
 '' +
-'<a href="http://www.mizu-voip.com" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'http://www.mizu-voip.com\')">http://www.mizu-voip.com</a><br />' +
+'<a href="https://www.mizu-voip.com" target="_blank" onclick="common_public.OpenLinkInInternalBrowser(\'https://www.mizu-voip.com\')">https://www.mizu-voip.com</a><br />' +
 'general/commercial: <a href="mailto:info@mizu-voip.com">info@mizu-voip.com</a><br />' +
 'technical support: <a href="mailto:webphone@mizu-voip.com">webphone@mizu-voip.com</a>',
 
@@ -2570,7 +2618,7 @@ dlg_about_msg_hu: "[BRANDNAME] Version [APPVERSION]<br /><br />" +
 
 "[BRANDNAME] is a SIP client.<br /><br />" +
 
-" Visit http://www.mizu-voip.com for more info. For customized/branded builds email to info@mizu-voip.com<br />" +
+" Visit https://www.mizu-voip.com for more info. For customized/branded builds email to info@mizu-voip.com<br />" +
 "Please use the Mizutech Forum (under the Support menu) for any questions, bug reports or suggestions.<br />" +
 "<br /><br /><br />" +
 "License agreement:<br /><br />" +
@@ -2595,8 +2643,8 @@ dlg_about_msg_hu: "[BRANDNAME] Version [APPVERSION]<br /><br />" +
 "Title, ownership rights, and intellectual property rights in the Software shall remain with MizuTech and/or its suppliers.<br />" +
 "This Agreement and the license granted hereunder will terminate automatically if you fail to comply with the limitations described herein. Upon termination, you must destroy all copies of the Software.<br />" +
 "This software contains some modules distributed with LGPL or modified BSD license:<br />" +
-"	-speex: http://www.speex.org <br />" +
-"	-iLBC: http://www.ilbcfreeware.org <br /><br />" +
+"	-speex: https://www.speex.org <br />" +
+"	-iLBC: https://www.ilbcfreeware.org <br /><br />" +
 
 "THE SOFTWARE IS PROVIDED \"AS IS\" WITHOUT ANY WARRANTY OF ANY KIND.<br />" +
 "Mizutech and its suppliers specifically disclaim any express or implied warranty of fitness for High Risk Activities.<br /><br />" +
@@ -3457,6 +3505,8 @@ normalizenumber__yes_pt: 'Sim',
 savetocontacts__no_pt: 'Não',
 savetocontacts__ask_pt: 'Perguntar',
 savetocontacts__yes_pt: 'Sim (não vai pedir um nome de contato)',
+
+status_enginestarted_pt: 'Motor de VoIP iniciado',
  
 sett_display_name_serveraddress_user_pt: 'Servidor',
 sett_comment_serveraddress_user_pt: 'Digite endereço do servidor (domínio ou IP: port)',
@@ -4502,7 +4552,7 @@ err_msg_22_de: 'Konfiguration nicht verfuehgbar, versuchen Sie es spaeter nochma
 err_nocallinprogress_de: 'Kein Anruf im Gange',
 err_flash_local_de: 'Flash-Engine funktioniert nur, wenn von einem Webserver gestartet, nicht aus lokalen Dateisystem',
 
-srvaddr_help_de: 'VoIP Service Provider Server Adresse (IP-Adresse oder den Domänennamen oder den DNS-SRV-Datensatz). Sie können auch die Nummer eines Ports ein Suffix, wenn der Server nicht auf dem Standard-SIP-Port (5060). Beispiel: Yourserver.com:6000<br /><br /> Im Falle, wenn Sie neu sind bei VoIP:<br /> Im Gegensatz zu einigen anderen beliebten Software wie Skype, wenn Sie standard SIP-Protokoll können Sie jeden VoIP-Anbieter. Es gibt hunderte solcher Dienste und Sie könnten auch auf Ihrem eigenen Server, beispielsweise durch die Verwendung von Mizu-Server oder Sternchen.<br /> Interne (Softphone Softphone) Anrufe werden in der Regel kostenlos, und die Kosten für abgehende Anrufe (Anrufe zu Mobil- oder Festnetz) sind in der Regel billiger als bei traditionellen Anbietern, insbesondere internationale Anrufe.<br /> Gibt es auch eine Menge anderer Vorteile für die Verwendung von VoIP, wie z. B. hohe Qualität (mit Wideband Codec), Freiheit (Sie können jederzeit Ihr Provider), die Control (können Sie ganz einfach Ihr Konto verwalten) und Flexibilität (viele zusätzliche Dienstleistungen wie die Aufzeichnung von Anrufen, Konferenzen und andere). Sie können sogar mehrere Anbieter (z. B. können Sie verwenden immer die billigere für Ihren Anruf).<br /> Wenn Sie don\'t haben einen VoIP-Account haben, dann können Sie innerhalb von wenigen Minuten bei jedem Anbieter und starten Sie mit VoIP-Jetzt: http://www.voip-info.org/wiki/view/Sip Telefon Service Provider',
+srvaddr_help_de: 'VoIP Service Provider Server Adresse (IP-Adresse oder den Domänennamen oder den DNS-SRV-Datensatz). Sie können auch die Nummer eines Ports ein Suffix, wenn der Server nicht auf dem Standard-SIP-Port (5060). Beispiel: Yourserver.com:6000<br /><br /> Im Falle, wenn Sie neu sind bei VoIP:<br /> Im Gegensatz zu einigen anderen beliebten Software wie Skype, wenn Sie standard SIP-Protokoll können Sie jeden VoIP-Anbieter. Es gibt hunderte solcher Dienste und Sie könnten auch auf Ihrem eigenen Server, beispielsweise durch die Verwendung von Mizu-Server oder Sternchen.<br /> Interne (Softphone Softphone) Anrufe werden in der Regel kostenlos, und die Kosten für abgehende Anrufe (Anrufe zu Mobil- oder Festnetz) sind in der Regel billiger als bei traditionellen Anbietern, insbesondere internationale Anrufe.<br /> Gibt es auch eine Menge anderer Vorteile für die Verwendung von VoIP, wie z. B. hohe Qualität (mit Wideband Codec), Freiheit (Sie können jederzeit Ihr Provider), die Control (können Sie ganz einfach Ihr Konto verwalten) und Flexibilität (viele zusätzliche Dienstleistungen wie die Aufzeichnung von Anrufen, Konferenzen und andere). Sie können sogar mehrere Anbieter (z. B. können Sie verwenden immer die billigere für Ihren Anruf).<br /> Wenn Sie don\'t haben einen VoIP-Account haben, dann können Sie innerhalb von wenigen Minuten bei jedem Anbieter und starten Sie mit VoIP-Jetzt: https://www.voip-info.org/wiki/view/Sip Telefon Service Provider',
 
 chatsms__auto_guess_or_ask_de: 'Auto probieren oder fragen',
 chatsms__sms_only_de: 'nur SMS',

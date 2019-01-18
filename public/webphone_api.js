@@ -1,4 +1,4 @@
-/**
+/** 
 * Mizu Webphone Java Script API.
 * You can control the webphone using the API functions below.
 */
@@ -7,7 +7,7 @@ var webphone_api = (function ()
 
 /** 
 * Configuration settings can be specified below.
-* You can also set the parameters in the webphone_api.js or at runtime by using the setparameter() function.
+* You can also set the parameters at runtime by using the setparameter() function.
 * The serveraddress parameter is mandatory! If username/password is not set, then the user will have to enter them. Other parameters are optional.
 */
 
@@ -17,7 +17,19 @@ var parameters = {
                     password: '', // preconfigured SIP account password
 					//other parameters are optional. See the documentation for the complete parameter list of available settings.
                     loglevel: 5
+                    //note: no comma is needed after the last parameter
                  };
+
+/** FCM Push Notifications config
+*/
+var config = {
+        apiKey: "AIzaSyCREU-8xSHkP093-OrE7dSouPYa5lwI380",
+        authDomain: "voippush-da64b.firebaseapp.com",
+        databaseURL: "https://voippush-da64b.firebaseio.com",
+        projectId: "voippush-da64b",
+        storageBucket: "voippush-da64b.appspot.com",
+        messagingSenderId: "191412546148"
+      };
 
 
 
@@ -77,7 +89,8 @@ function onRegisterFailed(callback)
  * direction: 1 (outgoing), 2 (incoming)
  * peername: is the other party username
  * peerdisplayname: is the other party display name if any
- * line: the status refers to this line*/
+ * line: the status refers to this line
+ * callid: Call-ID header value from SIP signaling*/
 function onCallStateChange(callback)
 {
     if ( !callback || typeof (callback) !== 'function' ) { return; }
@@ -93,7 +106,17 @@ function onChat(callback)
 {
     if ( !callback || typeof (callback) !== 'function' ) { return; }
     webphone_api.chatcb.push(callback);
-    // place your code here
+}
+
+/** Call this function once, passing a callback.
+ * The passed callback function will be called when SMS is received.
+ * --PARAMETERS --
+ * from: phone number of the sender
+ * msg: the content of the text message */
+function onSMS(callback)
+{
+    if ( !callback || typeof (callback) !== 'function' ) { return; }
+    webphone_api.smscb.push(callback);
 }
 
 /** Call this function once, passing a callback.
@@ -107,6 +130,7 @@ function onChat(callback)
  * peerdisplayname: is the other party display name if any
  * reason: disconnect reason as string
  * line: the CDR refers to this line
+ * callid: Call-ID SIP header
 */
 function onCdr(callback)
 {
@@ -174,7 +198,7 @@ function registerex (accounts)
         plhandler.RegisterEx(accounts);
 }
 
-/** Initiate call to a number, sip username or SIP URI.*/
+/** Initiate call to a number, sip username or SIP URI. Parameter "number" must be of type String.*/
 function call (number)
 {
     if (typeof (plhandler) === 'undefined' || plhandler === null)
@@ -183,7 +207,7 @@ function call (number)
         plhandler.Call(number);
 }
 
-/** Initiate video call to a number, sip username or SIP URI.*/
+/** Initiate video call to a number, sip username or SIP URI. Parameter "number" must be of type String.*/
 function videocall (number)
 {
     if (typeof (plhandler) === 'undefined' || plhandler === null)
@@ -305,6 +329,27 @@ function getregfailreason(callback, extended)
         plhandler.GetRegFailReason(callback, extended);
     else
         webphone_api.Log('ERROR, webphone_api: getregfailreason plhandler is not defined');
+}
+
+/** Play any sound file, at least wave files (raw linear PCM) are supported in the following format: PCM SIGNED 8000.0 Hz (8 kHz) 16 bit mono (2 bytes/frame) in little-endian (128 kbits)
+ * --PARAMETERS --
+ * start: int - 1 for start or 0 to stop the playback, -1 to pre-cache
+ * file: String - file name or full path
+ * looping: int - 1 to repeat, 0 to play once
+ * async: boolean - false if no, true if playback should be done in a separate thread (only 0 can be used only for local playback, not for streaming)
+ * islocal: boolean - true if the file have to be read from the client PC file system. False if remote file (for example if the file is on the webserver)
+ * toremotepeer: boolean - stream the playback to the connected peer
+ * line: int -used with toremotepeer if there are multiple calls in progress to specify the call (usually set to -1 for the current call if any)
+ * audiodevice: String - you can specify an exact device for playback. Otherwise set it to empty string
+ * isring: boolean - whether this sound is a ringtone/ringback
+*/
+function playsound(start, file, looping, async, islocal, toremotepeer, line, audiodevice, isring)
+{
+    if (typeof (plhandler) !== 'undefined' && plhandler !== null)
+        return plhandler.PlaySound(start, file, looping, async, islocal, toremotepeer, line, audiodevice, isring);
+    else
+        webphone_api.Log('ERROR, webphone_api: playsound plhandler is not defined');
+    return false;
 }
 
 /**
@@ -601,6 +646,26 @@ function listcontacts(all)
         return plhandler.ListContacts(all);
 }
 
+/** This function will return a String containing the whole call history list. If there are no entries in call history, it will return null.
+Call history entries will be separated by "carriage return new line": \r\n
+           Call history fields will be separated by "tabs": \t 
+           
+The order of fields and their meaning:
+type: int - 0=Outgoing call, 1=Incoming call, 2=Missed call
+name: String - can be a name, can be the same as the number or can be empty String
+number: String - the phone number/SIP URI
+date: int - timestamp date of call
+duration: int - duration of the call in milliseconds
+discreason: String - call disconnnect reason
+
+Example:   1 \t Name \t Number \t Date \t Duration \t Discreason
+*/
+function listcallhistory()
+{
+    if (typeof (plhandler) !== 'undefined' && plhandler !== null)
+        return plhandler.ListCallhistory();
+}
+
 /** Any additional parameters must be set before start/register/call is called*/
 function setparameter (param, value)
 {
@@ -657,6 +722,30 @@ function getline () //int
         return plhandler.GetLine();
     }
     return -1;
+}
+
+/** Call this function passing a line number and a callback
+ * The passed callback function will be called with one parameter, which will be the SIP Call-ID for the passed line number. */
+function linetocallid (line, callback)
+{
+    if ( !callback || typeof (callback) !== 'function' ) { return; }
+    if (typeof (plhandler) !== 'undefined' && plhandler !== null)
+    {
+        return plhandler.LineToCallID(line, callback);
+    }
+    webphone_api.Log('ERROR, webphone_api: linetocallid plhandler is not defined');
+}
+
+/** Call this function passing a SIP Call-ID and a callback
+ * The passed callback function will be called with one parameter, which will be the line number for the passed SIP Call-ID. */
+function callidtoline (callid, callback)
+{
+    if ( !callback || typeof (callback) !== 'function' ) { return; }
+    if (typeof (plhandler) !== 'undefined' && plhandler !== null)
+    {
+        return plhandler.CallIDToLine(callid, callback);
+    }
+    webphone_api.Log('ERROR, webphone_api: callidtoline plhandler is not defined');
 }
 
 /** Return true if the webphone is registered ("connected") to the SIP server.*/
@@ -789,7 +878,7 @@ function getsipmessage(dir, type, callback)
  * message: a text message intended to be displayed for the user
  * title: the title of the "popup/alert". This can be null/empty for some messages
  * NOTE: The text of the message is language dependent, meaning if the language of the webphone is changed, the message/title language is also changed.*/
-function ondisplay(callback)
+function onDisplay(callback)
 {
     if ( !callback || typeof (callback) !== 'function' ) { return; }
     webphone_api.displaycb.push(callback);
@@ -982,6 +1071,7 @@ var wphone = {
     onStart: onStart,
     onCallStateChange: onCallStateChange,
     onChat: onChat,
+    onSMS: onSMS,
     onCdr: onCdr,
     onDTMF: onDTMF,
     start: start,
@@ -1002,6 +1092,7 @@ var wphone = {
     getavailablecallfunc: getavailablecallfunc,
     getlastcalldetails: getlastcalldetails,
     getregfailreason: getregfailreason,
+    playsound: playsound,
     forward: forward,
     conference: conference,
     transfer: transfer,
@@ -1024,6 +1115,7 @@ var wphone = {
     deletecontact: deletecontact,
     getcontact: getcontact,
     listcontacts: listcontacts,
+    listcallhistory: listcallhistory,
     setparameter: setparameter,
     getparameter: getparameter,
     isregistered: isregistered,
@@ -1032,15 +1124,18 @@ var wphone = {
     
     setline: setline,
     getline: getline,
+    linetocallid: linetocallid,
+    callidtoline: callidtoline,
     checkpresence: checkpresence,
     setpresencestatus: setpresencestatus,
+    onPresenceStateChange: onPresenceStateChange,
     onBLFStateChange: onBLFStateChange,
     checkblf: checkblf,
     isencrypted: isencrypted,
     setsipheader: setsipheader,
     getsipheader: getsipheader,
     getsipmessage: getsipmessage,
-    ondisplay: ondisplay,
+    onDisplay: onDisplay,
     getworkdir: getworkdir,
     delsettings: delsettings,
     getenginename: getenginename,
@@ -1050,6 +1145,7 @@ var wphone = {
     jvoip: jvoip,
     loadscript: loadscript,
     parameters: parameters,
+    config: config,
     evcb: [],
     loadedcb: [],
     displaycb: [],
@@ -1059,6 +1155,7 @@ var wphone = {
     registerfailedcb: [],
     callstatechangecb: [],
     chatcb: [],
+    smscb: [],
     presencecb: [],
     blfcb: [],
     cdrcb: [],
@@ -1070,7 +1167,7 @@ return wphone;
 window.wpa = window.webphone_api = webphone_api;
 
 webphone_api.bd_logged = false;webphone_api.getbasedir2 = function (forceauto)
-{try{if (forceauto !== true){var wpbdir = webphone_api.parameters['webphonebasedir'];if (typeof(wpbdir) === 'undefined' || wpbdir === null || wpbdir === '.' || wpbdir.length < 2) { wpbdir = ''; }wpbdir = wpbdir.toString(); try{ wpbdir = wpbdir.replace(/^\s+|\s+$/g, ''); } catch(err) { ; }if (wpbdir.indexOf('/') === 0) { wpbdir = wpbdir.substring(1); }if (wpbdir.length > 1 && wpbdir.lastIndexOf('/') < wpbdir.length - 1){wpbdir = wpbdir + '/';}if (wpbdir && wpbdir.length > 0){if (webphone_api.bd_logged !== true){try{console.log('base diectory - webphonebasedir(helper): ' + wpbdir);} catch(err){ }}webphone_api.bd_logged = true;return wpbdir;}}
-var scriptElements = document.getElementsByTagName('script');if(scriptElements){for (var i = 0; i < scriptElements.length; i++){wpbdir = scriptElements[i].src;if (wpbdir && wpbdir.indexOf('webphone_api.js') > -1){wpbdir = wpbdir.substring(0, wpbdir.indexOf('webphone_api.js'));if (webphone_api.bd_logged !== true){try{console.log('base diectory - webphonebasedir(guessed): ' + wpbdir);} catch(err){ }}webphone_api.bd_logged = true;return wpbdir;}}}}catch(err) { try{console.log('ERROR, webphone_api getbasedir2');} catch(err2) { ; } }return '';};
-//webphone_api.loadscript (webphone_api.getbasedir2() + 'js/lib/api_helper.js', false);
+{try{if (forceauto !== true){var wpbdir = webphone_api.parameters['webphonebasedir'];if (typeof(wpbdir) === 'undefined' || wpbdir === null || wpbdir === '.' || wpbdir.length < 2) { wpbdir = ''; }wpbdir = wpbdir.toString(); try{ wpbdir = wpbdir.replace(/^\s+|\s+$/g, ''); } catch(err) { ; }if (wpbdir.indexOf('/') === 0) { wpbdir = wpbdir.substring(1); }if (wpbdir.length > 1 && wpbdir.lastIndexOf('/') < wpbdir.length - 1){wpbdir = wpbdir + '/';}if (wpbdir && wpbdir.length > 0){if (webphone_api.bd_logged !== true){try{if (webphone_api.parameters['logtoconsole'] != 'false' && webphone_api.parameters['logtoconsole'] != false) {console.log('base diectory - webphonebasedir(helper): ' + wpbdir);}} catch(err){ }}webphone_api.bd_logged = true;return wpbdir;}}
+var scriptElements = document.getElementsByTagName('script');if(scriptElements){for (var i = 0; i < scriptElements.length; i++){wpbdir = scriptElements[i].src;if (wpbdir && wpbdir.indexOf('webphone_api.js') > -1){wpbdir = wpbdir.substring(0, wpbdir.indexOf('webphone_api.js'));if (webphone_api.bd_logged !== true){try{if (webphone_api.parameters['logtoconsole'] != 'false' && webphone_api.parameters['logtoconsole'] != false) {console.log('base diectory - webphonebasedir(guessed): ' + wpbdir);}} catch(err){ }}webphone_api.bd_logged = true;return wpbdir;}}}}catch(err) { try{console.log('ERROR, webphone_api getbasedir2');} catch(err2) { ; } }return '';};
+// webphone_api.loadscript (webphone_api.getbasedir2() + 'js/lib/api_helper.js', false);
 document.write('<script type="text/javascript" src="' + webphone_api.getbasedir2() + 'js/lib/api_helper.js"></script>');

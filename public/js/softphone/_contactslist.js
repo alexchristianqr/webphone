@@ -93,6 +93,18 @@ function onCreate (event) // called only once - bind events here
         j$("#contactslist_additional_header_left").css("cursor", "pointer");
     }
     
+    j$( "#page_contactslist" ).keydown(function(event)
+    {
+        try{
+        var charCode = (event.keyCode) ? event.keyCode : event.which; // workaround for firefox
+        
+        if ( charCode === 27) // ESC
+        {
+            j$("#contactslist_list").prev("form").find("input[data-type=search]").val('').trigger("change");
+        }
+        } catch(err) { common.PutToDebugLogException(2, "_contactslist: keydown", err); }
+
+    });
     } catch(err) { common.PutToDebugLogException(2, "_contactslist: onCreate", err); }
 }
 
@@ -134,7 +146,7 @@ function onStart(event)
     }
     j$("#ctlist_title").attr("title", stringres.get("hint_page"));
     
-    var curruser = common.GetParameter('sipusername');
+    var curruser = common.GetCallerid();
     if (!common.isNull(curruser) && curruser.length > 0) { j$('#curr_user_contactslist').html(curruser); }
 // set status width so it's uses all space to curr_user
     var statwidth = common.GetDeviceWidth() - j$('#curr_user_contactslist').width() - 25;
@@ -267,13 +279,11 @@ function LoadContacts()
     {
 //--        if ( common.isNull(global.ctlist) || global.ctlist.length < 1 )
 //--        {
-//--            global.ctlist = [];
-            // String Name, String[] {numbers/sip uris}, String[] {number types}, int usage, long lastmodified, int delete flag, int isfavorit, String email, String address, String notes, String website
-//--            var ctitem = ['Ambrus Akos', ['8888', '0268123456', '13245679'], ['home', 'work', 'other'], '0', '13464346', '0', '0'];
+//--             var ctitem = ['Ambrus Akos', ['4444', '0268123456', '13245679'], ['home', 'work', 'other'], '0', '13464346', '0', '0', '', '', '', '', '0'];
 
-//--            var ctitem2 = ['Ambrus Tunde', ['5555', '987654'], ['other', 'fax_home'], '0', '23464346', '0', '0'];
-//--            var ctitem3 = ['Mariska Mari', ['123456', '4444'], ['other', 'fax_home'], '0', '23464346', '0', '0'];
-
+//--            var ctitem2 = ['Ambrus Tunde', ['9999', '987654'], ['other', 'fax_home'], '0', '23464346', '0', '0', '', '', '', '', '0'];
+//--            var ctitem3 = ['Mariska Mari', ['123456', '4444'], ['other', 'fax_home'], '0', '23464346', '0', '0', '', '', '', '', '0'];
+            
 //--            global.ctlist.push(ctitem); global.ctlist.push(ctitem2); global.ctlist.push(ctitem3);
             
 //--            for (var i = 0; i < 5; i++)
@@ -282,6 +292,7 @@ function LoadContacts()
 //--                global.ctlist.push(ctitem_generated);
 //--            }
 //--        }
+
     }
     
     if (common.isNull(global.ctlist) || global.ctlist.length < 1)
@@ -548,6 +559,7 @@ function OnListItemClick (id) // :no return value
                     ctTemp[common.CT_ADDRESS] = ctlistLocal[ctid][common.CT_ADDRESS];
                     ctTemp[common.CT_NOTES] = ctlistLocal[ctid][common.CT_NOTES];
                     ctTemp[common.CT_WEBSITE] = ctlistLocal[ctid][common.CT_WEBSITE];
+                    ctTemp[common.CT_LASTACTIVE] = ctlistLocal[ctid][common.CT_LASTACTIVE];
 
                     global.ctlist.push(ctTemp);
                     global.wasCtModified = true;
@@ -980,6 +992,8 @@ var MENUITEM_HELP = '#menuitem_contactslist_help';
 var MENUITEM_CONTACTSLIST_NEWCT = '#menuitem_contactslist_newcontact';
 var MENUITEM_EXIT = '#menuitem_contactslist_exit';
 var MENUITEM_SYNC = '#menuitem_contactslist_sync';
+var MENUITEM_FILETRANSFER = '#menuitem_contactslist_filetransfer';
+var MENUITEM_SORTCONTACTS = '#menuitem_contactslist_sortcontacts';
 
 function CreateOptionsMenu (menuId) // adding items to menu, called from html
 {
@@ -1013,6 +1027,19 @@ function CreateOptionsMenu (menuId) // adding items to menu, called from html
         if (featureset > 0 && (common.GetParameterInt('showsynccontactsmenu', 0) === 0 || common.GetParameterInt('showsynccontactsmenu', 0) === 1))
         {
             j$(menuId).append( '<li id="' + MENUITEM_SYNC + '"><a data-rel="back">' + stringres.get('menu_sync') + '</a></li>' ).listview('refresh');
+        }
+    }
+    
+    if (featureset > 0 && (common.GetParameterInt('showsynccontactsmenu', 0) === 0 || common.GetParameterInt('showsynccontactsmenu', 0) === 1))
+    {
+        j$(menuId).append( '<li id="' + MENUITEM_SORTCONTACTS + '"><a data-rel="back">' + stringres.get('menu_sortct') + '</a></li>' ).listview('refresh');
+    }
+    
+    if (common.GetConfigBool('hasfiletransfer', true) !== false && (common.GetConfigBool('usingmizuserver', false) === true || common.IsMizuWebRTCGateway() === true))
+    {
+        if (common.Glft() === true)
+        {
+            j$(menuId).append( '<li id="' + MENUITEM_FILETRANSFER + '"><a data-rel="back">' + stringres.get('filetransf_title') + '</a></li>' ).listview('refresh');
         }
     }
     
@@ -1051,6 +1078,9 @@ function MenuItemSelected(itemid)
             case MENUITEM_CONTACTSLIST_SETTINGS:
                 common.OpenSettings(true);
                 break;
+            case MENUITEM_FILETRANSFER:
+                common.FileTransfer('');
+                break;
             case MENUITEM_HELP:
                 setTimeout( function () { common.HelpWindow('settings'); }, 300);
                 break;
@@ -1066,9 +1096,120 @@ function MenuItemSelected(itemid)
                     common.DownloadContacts();
                 }
                 break;
+            case MENUITEM_SORTCONTACTS:
+                SortContactsPopup();
+                break;
         }
     });
     } catch(err) { common.PutToDebugLogException(2, "_contactslist: MenuItemSelected", err); }
+}
+
+function SortContactsPopup(popupafterclose)
+{
+    try{
+        var popupWidth = common.GetDeviceWidth();
+        if ( !common.isNull(popupWidth) && common.IsNumber(popupWidth) && popupWidth > 100 )
+        {
+            popupWidth = Math.floor(popupWidth / 1.2);
+        }else
+        {
+            popupWidth = 220;
+        }
+
+        var list = '';
+        var item = '<li id="[ITEMID]"><a data-rel="back">[ITEMTITLE]</a></li>';
+
+        var itemTemp = '';
+
+        itemTemp = item.replace('[ITEMID]', '#item_sort_name');
+        itemTemp = itemTemp.replace('[ITEMTITLE]', stringres.get('ct_sort_name'));
+        list = list + itemTemp;
+        itemTemp = '';
+
+        itemTemp = item.replace('[ITEMID]', '#item_sort_importance');
+        itemTemp = itemTemp.replace('[ITEMTITLE]', stringres.get('ct_sort_importance'));
+        list = list + itemTemp;
+        itemTemp = '';
+        
+        itemTemp = item.replace('[ITEMID]', '#item_sort_status');
+        itemTemp = itemTemp.replace('[ITEMTITLE]', stringres.get('ct_sort_status'));
+        list = list + itemTemp;
+        itemTemp = '';
+
+
+        var template = '' +
+    '<div id="sortct_popup" data-role="popup" class="ui-content messagePopup" data-overlay-theme="a" data-theme="a" style="max-width:' + popupWidth + 'px; min-width: ' + Math.floor(popupWidth * 0.6) + 'px;">' +
+
+        '<div data-role="header" data-theme="b">' +
+            '<a href="javascript:;" data-role="button" data-icon="delete" data-iconpos="notext" class="ui-btn-right closePopup">Close</a>' +
+            '<h1 class="adialog_title">' + stringres.get('ct_sort_title') + '</h1>' +
+        '</div>' +
+        '<div role="main" class="ui-content adialog_content" style="padding: 0; margin: 0;">' +
+
+            '<ul id="sortct_ul" data-role="listview" data-inset="true" data-icon="false" style="margin: 0;">' +
+                list +
+            '</ul>' +
+    //        '<a href="javascript:;" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">' + stringres.get('btn_close') + '</a>' +
+    //        '<a href="javascript:;" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" data-transition="flow">Delete</a>' +
+        '</div>' +
+        '<div data-role="footer" data-theme="b" class="adialog_footer">' +
+            '<a href="javascript:;" style="width: 98%;" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b adialog_2button" data-rel="back" data-transition="flow">' + stringres.get('btn_close') + '</a>' +
+        '</div>' +
+    '</div>';
+
+        popupafterclose = popupafterclose ? popupafterclose : function () {};
+
+        j$.mobile.activePage.append(template).trigger("create");
+        //j$.mobile.activePage.append(template).trigger("pagecreate");
+
+        j$.mobile.activePage.find(".closePopup").bind("tap", function (e)
+        {
+            j$.mobile.activePage.find(".messagePopup").popup("close");
+        });
+
+        j$.mobile.activePage.find(".messagePopup").popup().popup("open").bind(
+        {
+            popupafterclose: function ()
+            {
+                j$(this).unbind("popupafterclose").remove();
+
+                j$('#sortct_ul').off('click', 'li');
+
+                popupafterclose();
+            }
+        });
+
+        j$('#sortct_ul').on('click', 'li', function(event)
+        {
+            var itemid = j$(this).attr('id');
+
+            if (itemid === '#item_sort_name')
+            {
+                common.SaveParameter('sortcontacts', '0');
+                common.SortContacts();
+                PopulateList(false);
+            }
+            else if (itemid === '#item_sort_importance')
+            {
+                common.SaveParameter('sortcontacts', '1');
+                common.SortContacts();
+                PopulateList(false);
+            }
+            else if (itemid === '#item_sort_status')
+            {
+                common.SaveParameter('sortcontacts', '2');
+                common.SortContacts();
+                PopulateList(false);
+            }
+/*
+            j$( '#sortct_popup' ).on( 'popupafterclose', function( event )
+            {
+                j$( '#sortct_popup' ).off( 'popupafterclose' );
+
+                // add action here
+            });*/
+        });
+    } catch(err) { common.PutToDebugLogException(2, "_contactslist: SortContactsPopup", err); }
 }
 
 function ImportContactsPopup(popupafterclose)

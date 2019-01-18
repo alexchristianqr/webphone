@@ -210,13 +210,6 @@ function StartCall(isvideo)
 
     j$.mobile.back();
 
-//--    setTimeout(function ()
-//--    {
-//--        j$.mobile.changePage("#page_call", { transition: "pop", role: "page" });
-//--    }, 20);
-    
-//--    j$.mobile.changePage("#page_call", { transition: "pop", role: "page" });
-
     } catch(err) { common.PutToDebugLogException(2, "_callhistorydetails: StartCall", err); }
 }
 

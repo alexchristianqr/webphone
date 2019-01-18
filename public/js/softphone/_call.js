@@ -387,6 +387,9 @@ function NormalizeDisplayDetails(det_in)
         }
     }
     
+    // returns only unique elements
+    darr = common.UniqueArray(darr);
+    
     var middle = Math.ceil(darr.length / 2);
     for (var i = 0; i < darr.length; i++)
     {
@@ -460,7 +463,7 @@ function RejectCallMultiline(callapi)
     {
         var linetoreject = global.aline; // 1=outgoing, 2=incoming
         var setuptime = 0;
-
+/* NEM LOGIKUS !!!!
         for (var i = 0; i < global.ep.length; i++)
         {
             if (common.isNull(global.ep[i]) || global.ep[i].length < 5) { continue; }
@@ -473,7 +476,7 @@ function RejectCallMultiline(callapi)
                 linetoreject = global.ep[i][common.EP_LINE];
             }
         }
-
+*/
         plhandler_public.Reject(linetoreject);
 
     // update lines (remove line and set last active line)
@@ -2190,23 +2193,27 @@ function CreateOptionsMenu (menuId) // adding items to menu, called from html
         j$(menuId).append( '<li id="' + MENUITEM_CALL_MESSAGE + '"><a data-rel="back">' + stringres.get('menu_message') + '</a></li>' ).listview('refresh');
     }
     
-    if (featureset > 0 && availableFunc.indexOf('transfer') >= 0 && global.checkIfCallActive === true)
+    if (featureset > 0 && availableFunc.indexOf('transfer') >= 0 && (global.checkIfCallActive === true || common.GetNrOfActiveCalls() > 0))
     {
         j$(menuId).append( '<li id="' + MENUITEM_CALL_TRANSFER + '"><a data-rel="back">' + stringres.get('menu_transfer') + '</a></li>' ).listview('refresh');
     }
     
-    if (featureset > 0 && availableFunc.indexOf('mute') >= 0 && global.checkIfCallActive === true)
+    if (featureset > 0 && availableFunc.indexOf('mute') >= 0 && (global.checkIfCallActive === true || common.GetNrOfActiveCalls() > 0))
     {
         j$(menuId).append( '<li id="' + MENUITEM_CALL_MUTE + '"><a data-rel="back">' + stringres.get('menu_mute') + '</a></li>' ).listview('refresh');
     }
-    if (featureset > 0 && availableFunc.indexOf('hold') >= 0 && global.checkIfCallActive === true)
+    if (featureset > 0 && availableFunc.indexOf('hold') >= 0 && (global.checkIfCallActive === true || common.GetNrOfActiveCalls() > 0))
     {
         j$(menuId).append( '<li id="' + MENUITEM_CALL_HOLD + '"><a data-rel="back">' + stringres.get('menu_hold') + '</a></li>' ).listview('refresh');
     }
     
     if (common.CanIUseVideo() === true)
     {
-        j$(menuId).append( '<li id="' + MENUITEM_RECALL_VIDEO + '"><a data-rel="back">' + stringres.get('menu_videorecall') + '</a></li>' ).listview('refresh');
+        // don't display Video Recall menu item if used in android for video calls
+        if (common.IsCExt() < 1)
+        {
+            j$(menuId).append( '<li id="' + MENUITEM_RECALL_VIDEO + '"><a data-rel="back">' + stringres.get('menu_videorecall') + '</a></li>' ).listview('refresh');
+        }
     }
     
     if (common.IsMultiline() === 1)
@@ -2380,6 +2387,7 @@ function VideoRecall()
     HangupCall();
     setTimeout(function ()
     {
+        global.add_recall_header = true;
         webphone_api.videocall(callnumber);
         global.dontshow_closecall = false;
     }, 250);
@@ -2479,6 +2487,7 @@ function onStop(event)
     j$("#ml_buttons").html('');
     global.acallcount = 0;
     j$('#numpad_number').html('');
+    global.callPageStatusCachePerLine = {};
 
     
 //--    j$("#btn_hangup").off('click');

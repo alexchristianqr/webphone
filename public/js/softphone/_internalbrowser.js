@@ -69,6 +69,8 @@ function onStart(event)
         lastpage = common.Trim(lastpage);
     }
     
+    j$("#page_internalbrowser").css("background", "#FFFFFF");
+    
     OpenWebpage();
     
     } catch(err) { common.PutToDebugLogException(2, "_internalbrowser: onStart", err); }

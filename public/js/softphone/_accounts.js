@@ -104,7 +104,13 @@ function PopulateData()
         var sipitem = global.sipaccounts[i];
         var htmlitem = common.ReplaceAll(atemplate, '[NR]', i.toString());
         
-        htmlitem = htmlitem.replace('[USERNAME]', sipitem.username);
+        var acc_name = sipitem.username;
+        if (!common.isNull(sipitem.serveraddress) && sipitem.serveraddress.length > 0)
+        {
+            acc_name = acc_name + '@' + sipitem.serveraddress;
+        }
+
+        htmlitem = htmlitem.replace('[USERNAME]', acc_name);
         if (sipitem.ismain === true)
         {
             htmlitem = htmlitem.replace('[MAIN_CHECKED]', 'checked="checked"');
@@ -340,17 +346,34 @@ function AddAccount(popupafterclose)
         '<style>#addaccountpopup LABEL{ text-align: left; font-size: .8em; }</style>' +
         '<span>' + stringres.get('addaccount_msg') + '</span>' +
         
-        '<br /><label for="addacc_serveraddress">' + stringres.get('addacc_server') + ':</label>'+
+        '<label for="addacc_serveraddress">' + stringres.get('addacc_server') + ':</label>'+
         '<input type="text" id="addacc_serveraddress" name="addacc_serveraddress" data-theme="a" autocapitalize="off"/>' +
         
-        '<br /><label for="addacc_username">' + stringres.get('addacc_user') + ':</label>'+
+        '<label for="addacc_username">' + stringres.get('addacc_user') + ':</label>'+
         '<input type="text" id="addacc_username" name="addacc_username" data-theme="a" autocapitalize="off"/>' +
         
-        '<br /><label for="addacc_password">' + stringres.get('addacc_password') + ':</label>'+
+        '<label for="addacc_password">' + stringres.get('addacc_password') + ':</label>'+
         '<input type="text" id="addacc_password" name="addacc_password" data-theme="a" autocapitalize="off"/>' +
-        
-        '<br /><label for="addacc_ival">' + stringres.get('addacc_ival') + ':</label>'+
-        '<input type="text" id="addacc_ival" name="addacc_ival" value="3600" data-theme="a" autocapitalize="off"/>' +
+
+        '<br />' +
+        '<a href="javascript:;" id="show_hide_advanced">' + stringres.get('ac_showadvanced') + '</a>' +
+        '<br />' +
+        '<br />' +
+
+        '<div id="addaccountpopup_advanced" style="display: none; margin-left: 2em;">' +
+            '<label for="addacc_callerid">' + stringres.get('sett_display_name_username') + ':</label>'+
+            '<input type="text" id="addacc_callerid" name="addacc_callerid" value="" data-theme="a" autocapitalize="off"/>' +
+
+            '<label for="addacc_displayname">' + stringres.get('sett_display_name_displayname') + ':</label>'+
+            '<input type="text" id="addacc_displayname" name="addacc_displayname" value="" data-theme="a" autocapitalize="off"/>' +
+
+            '<label for="addacc_proxyaddress">' + stringres.get('sett_display_name_proxyaddress') + ':</label>'+
+            '<input type="text" id="addacc_proxyaddress" name="addacc_proxyaddress" value="" data-theme="a" autocapitalize="off"/>' +
+
+            '<br /><label for="addacc_ival">' + stringres.get('addacc_ival') + ':</label>'+
+            '<input type="text" id="addacc_ival" name="addacc_ival" value="3600" data-theme="a" autocapitalize="off"/>' +
+        '</div>'+
+
     '</div>' +
     '<div data-role="footer" data-theme="b" class="adialog_footer">' +
         '<a href="javascript:;" id="adialog_positive" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b adialog_2button" data-rel="back" data-transition="flow">' + stringres.get('btn_ok') + '</a>' +
@@ -366,6 +389,20 @@ function AddAccount(popupafterclose)
         {
             j$.mobile.activePage.find(".messagePopup").popup("close");
         });
+
+        j$.mobile.activePage.find(".messagePopup").bind(
+            {
+                popupbeforeposition: function()
+                {
+                    //j$(this).unbind("popupbeforeposition");//.remove();
+                    var maxHeight =  Math.floor( common.GetDeviceHeight() * 0.6 );  // j$(window).height() - 120;
+        
+                    if (j$(this).height() > maxHeight + 100)
+                    {
+                        j$('.messagePopup .ui-content').height(maxHeight);
+                    }
+                }
+            });
 
         j$.mobile.activePage.find(".messagePopup").popup().popup("open").bind(
         {
@@ -383,6 +420,10 @@ function AddAccount(popupafterclose)
             var srv = j$('#addacc_serveraddress').val();
             var usr = j$('#addacc_username').val();
             var pwd = j$('#addacc_password').val();
+
+            var callerid = j$('#addacc_callerid').val();
+            var displayname = j$('#addacc_displayname').val();
+            var proxyaddress = j$('#addacc_proxyaddress').val();
             var ivalstr = j$('#addacc_ival').val();
 
             j$( '#addaccountpopup' ).on( 'popupafterclose', function( event )
@@ -396,10 +437,17 @@ function AddAccount(popupafterclose)
                 if (common.isNull(usr) || usr.length < 1) { common.ShowToast(stringres.get('addacc_invalid') + ' ' + stringres.get('addacc_user')); return; }
                 if (common.isNull(pwd) || pwd.length < 1) { common.ShowToast(stringres.get('addacc_invalid') + ' ' + stringres.get('addacc_password')); return; }
                 if (common.isNull(ivalstr) || ivalstr.length < 1 || !common.IsNumber(ivalstr)) { common.ShowToast(stringres.get('addacc_invalid') + ' ' + stringres.get('addacc_ival')); return; }
-                
+
                 srv = common.NormalizeInput(srv, 0);
                 usr = common.NormalizeInput(usr, 0);
                 ivalstr = common.NormalizeInput(ivalstr, 0);
+
+                if (common.isNull(callerid)) { callerid = ''; }
+                if (common.isNull(displayname)) { displayname = ''; }
+                if (common.isNull(proxyaddress)) { proxyaddress = ''; }
+                callerid = common.NormalizeInput(callerid, 0);
+                displayname = common.NormalizeInput(displayname, 0);
+                proxyaddress = common.NormalizeInput(proxyaddress, 0);
                 
                 if (common.isNull(ivalstr) || common.IsNumber(ivalstr) == false) { ivalstr = '3600'; }
                 var ival = common.StrToInt(ivalstr);
@@ -407,7 +455,7 @@ function AddAccount(popupafterclose)
                 var ismain = false;
                 if (global.sipaccounts.length < 1) { ismain = true; }
                 
-                common.AddOneAcc(srv, usr, pwd, ival, true, ismain);
+                common.AddOneAcc(srv, usr, pwd, ival, true, ismain, false, callerid, displayname, proxyaddress);
               
                 PopulateData();
             });
@@ -415,6 +463,36 @@ function AddAccount(popupafterclose)
 
         j$('#adialog_negative').on('click', function (event)
         {
+            if (common.GetBrowser() === 'MSIE') { event.preventDefault(); }
+            ManuallyClosePopup(j$.mobile.activePage.find(".messagePopup"));
+        });
+
+        j$('#show_hide_advanced').on('click', function (event)
+        {
+            if (j$('#addaccountpopup_advanced').is(':visible'))
+            {
+                j$('#addaccountpopup_advanced').hide();
+                j$('#show_hide_advanced').html(stringres.get('ac_showadvanced'));
+
+                var maxHeight =  Math.floor( common.GetDeviceHeight() * 0.6 );  // j$(window).height() - 120;
+        
+                if (j$('.messagePopup .ui-content').height() > maxHeight + 100)
+                {
+                    j$('.messagePopup .ui-content').height(maxHeight);
+                }
+            }else
+            {
+                j$('#addaccountpopup_advanced').show();
+                j$('#show_hide_advanced').html(stringres.get('ac_hideadvanced'));
+
+                var maxHeight =  Math.floor( common.GetDeviceHeight() * 0.6 );  // j$(window).height() - 120;
+        
+                if (j$('.messagePopup .ui-content').height() > maxHeight + 100)
+                {
+                    j$('.messagePopup .ui-content').height(maxHeight);
+                }
+            }
+            
             if (common.GetBrowser() === 'MSIE') { event.preventDefault(); }
             ManuallyClosePopup(j$.mobile.activePage.find(".messagePopup"));
         });
@@ -442,8 +520,7 @@ function ManuallyClosePopup(popupelement) // workaround for IE, sometimes popups
     } catch(err) { common.PutToDebugLogException(2, "_accounts: ManuallyClosePopup", err); }
 }
 
-var MENUITEM_ACCOUNTS_SAVE = '#menuitem_accounts_save';
-var MENUITEM_ACCOUNTS_REVERT = '#menuitem_accounts_revert';
+var MENUITEM_ACCOUNTS_CLOSE = '#menuitem_accounts_close';
 
 function CreateOptionsMenu (menuId) // adding items to menu, called from html
 {
@@ -461,9 +538,7 @@ function CreateOptionsMenu (menuId) // adding items to menu, called from html
     if (menuId.charAt(0) !== '#') { menuId = '#' + menuId; }
     
     j$(menuId).html('');
-    j$(menuId).append( '<li id="' + MENUITEM_ACCOUNTS_SAVE + '"><a data-rel="back">' + stringres.get('btn_save') + '</a></li>' ).listview('refresh');
-    
-    j$(menuId).append( '<li id="' + MENUITEM_ACCOUNTS_REVERT + '"><a data-rel="back">' + stringres.get('btn_revert') + '</a></li>' ).listview('refresh');
+    j$(menuId).append( '<li id="' + MENUITEM_ACCOUNTS_CLOSE + '"><a data-rel="back">' + stringres.get('btn_close') + '</a></li>' ).listview('refresh');
 
     return true;
     
@@ -483,10 +558,7 @@ function MenuItemSelected(itemid)
         
         switch (itemid)
         {
-            case MENUITEM_ACCOUNTS_SAVE:
-                SaveContact();
-                break;
-            case MENUITEM_ACCOUNTS_REVERT:
+            case MENUITEM_ACCOUNTS_CLOSE:
                 j$.mobile.back();
                 break;
         }

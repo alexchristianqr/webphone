@@ -6,7 +6,8 @@
                 <div class="col-8 my-auto"><h6>Webphone Securitec</h6></div>
                 <div class="col-4 text-right">
                     <template v-if="true">
-                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modalConfiguration">
+                        <button type="button" class="btn btn-secondary" data-toggle="modal"
+                                data-target="#modalConfiguration">
                             <i class="fa fa-cog"></i>
                         </button>
                     </template>
@@ -21,7 +22,7 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <div class="input-group input-group-lg">
-                                    <input ref="inputDestination" v-model="input.transfer" type="text" class="form-control" maxlength="9">
+                                    <input title="" ref="inputDestination" v-model="input.transfer" type="text" class="form-control" maxlength="9">
                                     <template v-if="input.transfer !== ''">
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-primary" @click="doClear"><i class="fa fa-times"></i></button>
@@ -33,7 +34,7 @@
                                 <template v-for="(v,k) in dataTeclado">
                                     <template v-if="k%3 === 0">
                                         <div class="col-4 pr-0">
-                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="returnLetter(k)">
+                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
                                                 <template v-if="v.icon !== undefined">
                                                     <i :class="v.icon"></i>
                                                 </template>
@@ -45,14 +46,14 @@
                                     </template>
                                     <template v-if="k%3 === 1">
                                         <div class="col-4 pl-1 pr-1">
-                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="returnLetter(k)">
+                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
                                                 <span class="h4">{{v.chart}}</span>
                                             </button>
                                         </div>
                                     </template>
                                     <template v-if="k%3 === 2">
                                         <div class="col-4 pl-0">
-                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="returnLetter(k)">
+                                            <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
                                                 <template v-if="v.icon !== undefined">
                                                     <i :class="v.icon"></i>
                                                 </template>
@@ -64,17 +65,20 @@
                                     </template>
                                 </template>
                             </div>
-                            <button type="button" :disabled="input.transfer===''?true:false" class="btn btn-success btn-block btn-lg" @click="doTranferCall">Transferir Llamada</button>
+                            <button type="button" :disabled="input.transfer === '' ? true : false" class="btn btn-success btn-block btn-lg" @click="doTranferCall">Transferir Llamada</button>
                         </div>
                     </template>
                     <div class="card-footer pl-2 pr-2 pb-2">
                         <div class="row">
                             <template v-if="button.call.status">
                                 <div class="col-8 pr-1"><!-- Llamar -->
-                                    <button @click="doCall" :disabled="button.call.disabled" class="btn btn-success btn-block">Call</button>
+                                    <button @click="doCall" :disabled="button.call.disabled"
+                                            class="btn btn-success btn-block">Call
+                                    </button>
                                 </div>
                                 <div class="col-4 pl-0"><!-- Eliminar Caracter -->
-                                    <button type="button" class="btn btn-secondary btn-block"><i class="fa fa-reply"></i></button>
+                                    <button type="button" class="btn btn-secondary btn-block"><i
+                                            class="fa fa-reply"></i></button>
                                 </div>
                             </template>
                             <template v-if="!button.call.status">
@@ -85,25 +89,29 @@
                                     </span>
                                 </div>
                                 <div class="col-2"><!-- Pausar Llamada -->
-                                    <button type="button" :disabled="button.hold.disabled" @click="doHold" class="btn btn-secondary btn-block">
+                                    <button type="button" :disabled="button.hold.disabled" @click="doHold"
+                                            class="btn btn-secondary btn-block">
                                         <i v-show="button.hold.status" class="fa fa-play"></i>
                                         <i v-show="!button.hold.status" class="fa fa-pause"></i>
                                     </button>
                                 </div>
                                 <div class="col-2"><!-- Transferir Llamada -->
-                                    <button title="Tranferir Llamada" :disabled="button.transfer.disabled" @click="doTransfer" class="btn btn-secondary btn-block">
+                                    <button title="Tranferir Llamada" :disabled="button.transfer.disabled"
+                                            @click="doTransfer" class="btn btn-secondary btn-block">
                                         <i v-show="!button.transfer.status" class="fa fa-retweet"></i>
                                         <i v-show="button.transfer.status" class="fa fa-exchange"></i>
                                     </button>
                                 </div>
                                 <div class="col-2"><!-- Mute Llamada -->
-                                        <button :disabled="button.mute.disabled" @click="doMute" class="btn btn-secondary btn-block">
-                                            <i v-show="!button.mute.status" class="fa fa-microphone"></i>
-                                            <i v-show="button.mute.status" class="fa fa-microphone-slash"></i>
-                                        </button>
+                                    <button :disabled="button.mute.disabled" @click="doMute"
+                                            class="btn btn-secondary btn-block">
+                                        <i v-show="!button.mute.status" class="fa fa-microphone"></i>
+                                        <i v-show="button.mute.status" class="fa fa-microphone-slash"></i>
+                                    </button>
                                 </div>
                                 <div class="col-2"><!-- Colgar Llamada -->
-                                    <button :disabled="button.hangup.disabled" @click="doHangup" class="btn btn-danger btn-block"><i class="fa fa-times"></i></button>
+                                    <button :disabled="button.hangup.disabled" @click="doHangup"
+                                            class="btn btn-danger btn-block"><i class="fa fa-times"></i></button>
                                 </div>
                             </template>
                         </div>
@@ -118,32 +126,21 @@
                 <table class="table table-sm table-bordered">
                     <thead class="bg-secondary text-white">
                     <tr>
+                        <th>#</th>
                         <th>Telefonos/Cel.</th>
-                        <th>Contactabilidad</th>
                         <th>Accion</th>
                         <th>Historial</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="(v,k) in dataList" class="my-auto">
-                        <td class="my-auto">
-                            <span class="my-auto">{{v[1]}}</span>
-                        </td>
-                        <td></td>
+                        <td>{{v.id}}</td>
+                        <td class="my-auto">{{v.phone}}</td>
                         <td class="text-left">
-                            <button type="button" class="btn btn-success btn-sm mr-1" @click="doCall(v[1])">Llamar</button>
-                            <button type="button" class="btn btn-secondary btn-sm mr-1">Inactivar</button>
-                            <!--<div class="row">-->
-                            <!--<div class="col-6">-->
-                            <!--<button type="button" class="btn btn-success btn-sm btn-block" @click="doCall(v[1])">Llamar</button>-->
-                            <!--</div>-->
-                            <!--<div class="col-6">-->
-                            <!--<button type="button" class="btn btn-secondary btn-sm btn-block">Inactivar</button>-->
-                            <!--</div>-->
-                            <!--</div>-->
+                            <button type="button" class="btn btn-success btn-sm mr-1 btn-block" @click="doCall(v.phone)"><i class="fa fa-phone"></i></button>
                         </td>
                         <td>
-                            <button class="btn btn-secondary btn-sm btn-block">Ver Historial</button>
+                            <button class="btn btn-secondary btn-sm btn-block"><i class="fa fa-history"></i></button>
                         </td>
                     </tr>
                     </tbody>
@@ -162,16 +159,15 @@
 
         <!-- Footer -->
         <footer class="bg-light p-3 mt-3 text-center w-100">
-            <span class="text-dark">Developed by @AlexChristian {{(new Date).getFullYear()}}</span>
+            <span class="text-dark">developed by dev@securitec.pe {{(new Date).getFullYear()}}</span>
         </footer>
 
         <!-- Modal -->
-        <div class="modal fade" id="modalConfiguration" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-             aria-hidden="true">
+        <div class="modal fade" id="modalConfiguration" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Configuration SIP</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Configuración SIP</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -179,66 +175,45 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-12">
-                                <span class="text-uppercase font-weight-bold"><i class="fa fa-angle-right mr-1"></i>Management</span>
+                                <span class="text-uppercase font-weight-normal">Management</span>
                             </div>
                             <div class="w-100">
                                 <hr>
                             </div>
                             <div class="col-12">
-                                <div hidden class="form-group">
-                                    <span>Display Name</span>
-                                    <input v-model="params.display_name" type="text" class="form-control">
-                                </div>
                                 <div class="form-group">
                                     <span>Username</span>
-                                    <input v-model="params.username" type="text" class="form-control">
+                                    <input v-model="params.username" type="text" class="form-control form-control-sm">
                                 </div>
                                 <div class="form-group">
                                     <span>Password</span>
-                                    <input v-model="params.password" type="password" class="form-control">
-                                </div>
-                                <div hidden class="form-group">
-                                    <span>Authorization</span>
-                                    <input v-model="params.authorization" type="text" class="form-control">
+                                    <input v-model="params.password" type="password" class="form-control form-control-sm">
                                 </div>
                                 <div class="form-group">
                                     <span>Domain</span>
-                                    <input v-model="params.domain" type="text" class="form-control">
+                                    <input v-model="params.domain" type="text" class="form-control form-control-sm">
                                 </div>
                             </div>
                             <div class="w-100">
                                 <hr>
                             </div>
                             <div class="col-12">
-                                <span class="text-uppercase font-weight-bold"><i class="fa fa-angle-right mr-1"></i>Settings</span>
+                                <span class="text-uppercase font-weight-normal">Settings</span>
                             </div>
                             <div class="w-100">
                                 <hr>
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
-                                    <span>Volume Microphone <span class="text-secondary">({{button.volume.microphone}})</span></span>
-                                    <input @change="doSetVolume(0,button.volume.microphone)"
-                                           v-model="button.volume.microphone" type="range" class="form-control" min="0"
-                                           max="100" step="5" value="100"/>
-                                </div>
-                                <div class="form-group">
-                                    <span>Volume Ringback <span
-                                            class="text-secondary">({{button.volume.ringback}})</span></span>
-                                    <input @change="doSetVolume(1,button.volume.ringback)"
-                                           v-model="button.volume.ringback" type="range" class="form-control" min="0"
-                                           max="100" step="5" value="100"/>
-                                </div>
-                                <div class="form-group">
-                                    <span>Volume Playback <span class="text-secondary">({{button.volume.playback}})</span></span>
-                                    <input @change="doSetVolume(2,button.volume.playback)" v-model="button.volume.playback" type="range" class="form-control" min="0" max="100" step="5"/>
+                                    <label>Volumen Microfono <span class="text-secondary">({{button.volume.microphone}})</span></label>
+                                    <input title="Microfono" @change="doSetVolume(0,button.volume.microphone)" v-model="button.volume.microphone" type="range" class="form-control form-control-sm" min="0" max="100" step="5" value="100"/>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button @click.prevent="doStart" type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button @click.prevent="doStart" type="button" class="btn btn-primary" data-dismiss="modal">Guardar</button>
                     </div>
                 </div>
             </div>
@@ -264,17 +239,6 @@
 				inPause:false,
 				inVideoCall:false,
 				start:false,
-			},
-			params:{
-				display_name:'202',
-				username:'202',
-				password:'7015102',
-				authorization:'202',
-				domain:'192.168.80.3',
-				destination:'',
-			},
-			input:{
-				transfer:'',
 			},
 			time:{
 				start:'00:00:00',
@@ -308,12 +272,63 @@
 					playback:75,
 				},
 			},
-			dataList:[],
+			dataList:[
+				{id:1, phone:'955588297'},
+				{id:2, phone:'994719466'},
+			],
+			params:{
+				display_name:'204',
+				username:'204',
+				password:'7015102',
+				domain:'192.168.80.3',
+				authorization:'204',
+				destination:'955588297',
+			},
+			modal:[
+				{
+					title:'Teclado Virtual',
+					status:false,
+					size:'sm',
+					footerclass:['justify-content-center']
+				},
+				{
+					title:'Transferencia de Llamada',
+					status:false,
+					size:'sm',
+					footerclass:['justify-content-center']
+				},
+			],
+			input:{
+				marker:'',
+				keyboard:'',
+				transfer:'',
+			},
+			buttons:{
+				call:{status:true},
+				hangup:{status:false},
+				play:{status:true,disabled:true},
+				pause:{status:false,disabled:true},
+				microphone:{status:true,disabled:true},
+				transfer:{status:true,disabled:true},
+				keyboard:{status:true,disabled:true},
+			},
+			dataKeyboard:[
+				{chart:'1', value:'abc'},
+				{chart:'2', value:'abc'},
+				{chart:'3', value:'def'},
+				{chart:'4', value:'ghi'},
+				{chart:'5', value:'jkl'},
+				{chart:'6', value:'mno'},
+				{chart:'7', value:'pqrs'},
+				{chart:'8', value:'tuv'},
+				{chart:'9', value:'wxyz'},
+				{chart:'*', value:'', icon:'fas fa-asterisk'},
+				{chart:'0', value:''},
+				{chart:'#', value:'', icon:'fas fa-hashtag'},
+			],
 		}),
 		created(){
-			this.getData()
-			this.listenPrintEvents()
-			this.listenChanges()
+			// this.doStart()
 		},
 		methods:{
 			getData(){
@@ -324,10 +339,12 @@
 				this.$refs.inputDestination.focus()
 			},
 			doStart(){
+				webphone_api.setparameter('serveraddress', this.params.domain)
 				webphone_api.setparameter('username', this.params.username)
 				webphone_api.setparameter('password', this.params.password)
-				webphone_api.setparameter('serveraddress', this.params.domain)
 				webphone_api.start()
+				this.listenPrintEvents()
+				this.listenChanges()
 			},
 			doAccept(){
 				webphone_api.accept()
@@ -402,7 +419,7 @@
 							this.doHangup()
 							break
 						case 'callRinging':
-							console.log('Ring Ring')
+							console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Ring Ring...')
 							break
 						case 'callConnected':
 							this.button.mute.disabled=false
@@ -438,5 +455,10 @@
 </script>
 
 <style scoped>
-
+    .btn-circle{
+        width: 3rem;
+        height: 3rem;
+        border-radius: 100%;
+        padding: 0;
+    }
 </style>
