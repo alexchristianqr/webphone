@@ -1,5 +1,5 @@
 <template>
-  <div class="py-5">
+  <div class="py-2">
     <b-row>
       <b-col cols="6" class="my-auto">
         <span class="h5">Webphone Example</span>
@@ -12,113 +12,121 @@
       </b-col>
     </b-row>
 
+    <!-- Teclado -->
     <b-row>
-      <b-col offset-sm="10" cols="8">
+      <b-col lg="6" cols="12" class="mx-auto py-3">
         <!-- App Webphone -->
-        <b-card no-body v-show="screen.start">
-          <template v-if="screen.inTransfer">
-            <div class="card-body">
-              <div class="form-group">
-                <div class="input-group input-group-lg">
-                  <input title="" ref="inputDestination" v-model="input.transfer" type="text" class="form-control" maxlength="9" />
-                  <template v-if="input.transfer !== ''">
-                    <div class="input-group-append">
-                      <button type="button" class="btn btn-primary" @click="doClear"><i class="fa fa-times"></i></button>
-                    </div>
-                  </template>
-                </div>
-              </div>
-              <div class="row">
-                <template v-for="(v, k) in dataTeclado">
-                  <template v-if="k % 3 === 0">
-                    <div class="col-4 pr-0">
-                      <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
-                        <template v-if="v.icon !== undefined">
-                          <i :class="v.icon"></i>
-                        </template>
-                        <template v-else>
-                          <span class="h4">{{ v.chart }}</span>
-                        </template>
-                      </button>
-                    </div>
-                  </template>
-                  <template v-if="k % 3 === 1">
-                    <div class="col-4 pl-1 pr-1">
-                      <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
-                        <span class="h4">{{ v.chart }}</span>
-                      </button>
-                    </div>
-                  </template>
-                  <template v-if="k % 3 === 2">
-                    <div class="col-4 pl-0">
-                      <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
-                        <template v-if="v.icon !== undefined">
-                          <i :class="v.icon"></i>
-                        </template>
-                        <template v-else>
-                          <span class="h4">{{ v.chart }}</span>
-                        </template>
-                      </button>
-                    </div>
-                  </template>
+        <b-card no-body class="p-2">
+          <template v-if="!screen.inTransfer">
+            <div class="form-group">
+              <div class="input-group input-group-lg">
+                <input title="" ref="inputDestination" v-model="input.transfer" type="text" class="form-control" maxlength="9" />
+                <template v-if="input.transfer !== ''">
+                  <div class="input-group-append">
+                    <button type="button" class="btn btn-primary" @click="doClear"><i class="fa fa-times"></i></button>
+                  </div>
                 </template>
               </div>
-              <button type="button" :disabled="input.transfer === '' ? true : false" class="btn btn-success btn-block btn-lg" @click="doTranferCall">Transferir Llamada</button>
             </div>
-          </template>
-          <div class="card-footer pl-2 pr-2 pb-2">
             <div class="row">
-              <template v-if="button.call.status">
-                <div class="col-8 pr-1">
-                  <!-- Llamar -->
-                  <button @click="doCall" :disabled="button.call.disabled" class="btn btn-success btn-block">Call</button>
-                </div>
-                <div class="col-4 pl-0">
-                  <!-- Eliminar Caracter -->
-                  <button type="button" class="btn btn-secondary btn-block"><i class="fa fa-reply"></i></button>
-                </div>
-              </template>
-              <template v-if="!button.call.status">
-                <div class="col-4">
-                  <span class="btn btn-block">
-                    <i class="fa fa-user-circle mr-3"></i>
-                    <small>{{ timer }}</small>
-                  </span>
-                </div>
-                <div class="col-2">
-                  <!-- Pausar Llamada -->
-                  <button type="button" :disabled="button.hold.disabled" @click="doHold" class="btn btn-secondary btn-block">
-                    <i v-show="button.hold.status" class="fa fa-play"></i>
-                    <i v-show="!button.hold.status" class="fa fa-pause"></i>
-                  </button>
-                </div>
-                <div class="col-2">
-                  <!-- Transferir Llamada -->
-                  <button title="Tranferir Llamada" :disabled="button.transfer.disabled" @click="doTransfer" class="btn btn-secondary btn-block">
-                    <i v-show="!button.transfer.status" class="fa fa-retweet"></i>
-                    <i v-show="button.transfer.status" class="fa fa-exchange"></i>
-                  </button>
-                </div>
-                <div class="col-2">
-                  <!-- Mute Llamada -->
-                  <button :disabled="button.mute.disabled" @click="doMute" class="btn btn-secondary btn-block">
-                    <i v-show="!button.mute.status" class="fa fa-microphone"></i>
-                    <i v-show="button.mute.status" class="fa fa-microphone-slash"></i>
-                  </button>
-                </div>
-                <div class="col-2">
-                  <!-- Colgar Llamada -->
-                  <button :disabled="button.hangup.disabled" @click="doHangup" class="btn btn-danger btn-block"><i class="fa fa-times"></i></button>
-                </div>
+              <template v-for="(v, k) in dataTeclado">
+                <template v-if="k % 3 === 0">
+                  <div class="col-4 pr-0">
+                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
+                      <template v-if="v.icon !== undefined">
+                        <i :class="v.icon"></i>
+                      </template>
+                      <template v-else>
+                        <span class="h4">{{ v.chart }}</span>
+                      </template>
+                    </button>
+                  </div>
+                </template>
+                <template v-if="k % 3 === 1">
+                  <div class="col-4 pl-1 pr-1">
+                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
+                      <span class="h4">{{ v.chart }}</span>
+                    </button>
+                  </div>
+                </template>
+                <template v-if="k % 3 === 2">
+                  <div class="col-4 pl-0">
+                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
+                      <template v-if="v.icon !== undefined">
+                        <i :class="v.icon"></i>
+                      </template>
+                      <template v-else>
+                        <span class="h4">{{ v.chart }}</span>
+                      </template>
+                    </button>
+                  </div>
+                </template>
               </template>
             </div>
-          </div>
+            <b-row>
+              <b-col cols="12" class="pb-1">
+                <b-button block variant="success" :disabled="input.transfer === ''" @click="doTranferCall">Transferir llamada</b-button>
+              </b-col>
+            </b-row>
+          </template>
+          <b-row>
+            <template v-if="button.call.status">
+              <b-col cols="8">
+                <!-- Llamar -->
+                <b-button variant="success" @click="doCall" :disabled="button.call.disabled">
+                  <b-icon-telephone-fill></b-icon-telephone-fill>
+                  <span> Call</span>
+                </b-button>
+              </b-col>
+              <b-col cols="4" class="text-right">
+                <!-- Eliminar caractér -->
+                <b-button variant="secondary">
+                  <b-icon-backspace-fill></b-icon-backspace-fill>
+                </b-button>
+              </b-col>
+            </template>
+            <template v-else>
+              <b-col cols="4">
+                <span class="btn btn-block">
+                  <i class="fa fa-user-circle mr-3"></i>
+                  <small>{{ timer }}</small>
+                </span>
+              </b-col>
+              <b-col cols="2">
+                <!-- Pausar Llamada -->
+                <b-button variant="secondary" :disabled="button.hold.disabled" @click="doHold">
+                  <b-icon-play v-show="button.hold.status"></b-icon-play>
+                  <b-icon-pause v-show="!button.hold.status"></b-icon-pause>
+                </b-button>
+              </b-col>
+              <b-col cols="2">
+                <!-- Transferir Llamada -->
+                <b-button title="Tranferir Llamada" variant="secondary" :disabled="button.transfer.disabled" @click="doTransfer">
+                  <b-icon-telephone-forward-fill v-show="!button.transfer.status"></b-icon-telephone-forward-fill>
+                  <b-icon-pause v-show="button.transfer.status"></b-icon-pause>
+                </b-button>
+              </b-col>
+              <b-col cols="2">
+                <!-- Mute Llamada -->
+                <b-button title="Silenciar Llamada" variant="secondary" :disabled="button.mute.disabled" @click="doMute">
+                  <b-icon-mic-fill v-show="!button.mute.status"></b-icon-mic-fill>
+                  <b-icon-mic-mute v-show="button.mute.status"></b-icon-mic-mute>
+                </b-button>
+              </b-col>
+              <b-col cols="2">
+                <!-- Colgar Llamada -->
+                <b-button title="Terminar Llamada" variant="danger" :disabled="button.hangup.disabled" @click="doHangup">
+                  <b-icon-telephone-x-fill></b-icon-telephone-x-fill>
+                </b-button>
+              </b-col>
+            </template>
+          </b-row>
         </b-card>
       </b-col>
     </b-row>
 
     <!-- Lista de Llamadas -->
-    <b-table-simple responsive striped class="pt-5">
+    <b-table-simple responsive striped class="pt-2">
       <b-thead>
         <b-tr>
           <b-td>#</b-td>
@@ -129,8 +137,8 @@
       </b-thead>
       <b-tbody>
         <b-tr v-for="(v, k) in dataList" class="my-auto">
-          <b-td>{{ v.id }}</b-td>
-          <b-td class="my-auto">{{ v.phone }}</b-td>
+          <b-td class="align-middle">{{ v.id }}</b-td>
+          <b-td class="align-middle">{{ v.phone }}</b-td>
           <b-td class="text-left">
             <b-button variant="success" @click="doCall(v.phone)">
               <b-icon-telephone-fill></b-icon-telephone-fill>
@@ -146,27 +154,14 @@
     </b-table-simple>
 
     <!-- Activar para depurar data -->
-    <template v-if="true">
+    <template v-if="false">
       <div class="w-100">
         <pre class="bg-light" style="max-height: 200px; min-height: 200px"><code class="ml-2 mr-2" v-html="print_console"></code></pre>
       </div>
     </template>
 
     <!-- Footer -->
-<!--    <footer class=" p-3 mt-3 text-center w-100">-->
-<!--      <span class="text-dark">Developed by <a href="https://github.com/alexchristianqr/">@alexchristianqr</a> {{ new Date().getFullYear() }}</span>-->
-<!--    </footer>-->
-
-    <b-form-group class="pt-lg-0 pt-3">
-      <div>
-        <span class="mr-1">Made with</span>
-        <img src="@/assets/logo.png" :width="18" class="mr-1" alt="Vuejs" title="Vuejs" />
-        <span>by </span>
-        <b-link target="_blank" href="https://github.com/alexchristianqr">@alexchristianqr </b-link>
-        <span>with love </span>
-        <span class="text-danger" style="font-size: 18px">&hearts;</span>
-      </div>
-    </b-form-group>
+    <MyFooter></MyFooter>
 
     <!-- Modal -->
     <b-modal ref="modal" id="modalConfiguration" title="Configuración SIP">
@@ -226,9 +221,11 @@
 <script>
 import '../../../public/webphone_api.js'
 import PhoneService from '../../services/PhoneService'
+import MyFooter from '@/components/common/MyFooter'
 
 export default {
   name: 'Phone',
+  components: { MyFooter },
   data: () => ({
     timer: '00:00:00',
     totalSeconds: 0,
