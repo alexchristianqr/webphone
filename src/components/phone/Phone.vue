@@ -17,52 +17,76 @@
       <b-col lg="6" cols="12" class="mx-auto py-3">
         <!-- App Webphone -->
         <b-card no-body class="p-2">
-          <template v-if="!screen.inTransfer">
-            <div class="form-group">
-              <div class="input-group input-group-lg">
-                <input title="" ref="inputDestination" v-model="input.transfer" type="text" class="form-control" maxlength="9" />
-                <template v-if="input.transfer !== ''">
-                  <div class="input-group-append">
-                    <button type="button" class="btn btn-primary" @click="doClear"><i class="fa fa-times"></i></button>
-                  </div>
+          <template v-if="screen.inTransfer">
+            <div class="pb-1">
+              <b-input-group>
+
+                <b-form-input ref="inputDestination" v-model="input.transfer" maxlength="9"></b-form-input>
+
+                <template #append>
+                  <b-button variant="danger" @click="doClear">
+                    <b-icon-x></b-icon-x>
+                  </b-button>
                 </template>
-              </div>
+              </b-input-group>
             </div>
-            <div class="row">
+            <b-row>
               <template v-for="(v, k) in dataTeclado">
                 <template v-if="k % 3 === 0">
-                  <div class="col-4 pr-0">
-                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
+                  <b-col cols="4" class="pr-0">
+                    <b-button variant="light" block @click="doDTMF(v.chart)" class="mb-1">
                       <template v-if="v.icon !== undefined">
-                        <i :class="v.icon"></i>
+                        <!--                        <i :class="v.icon"></i>-->
+                        <span style="font-size: 1.25em">{{ v.chart }}</span>
                       </template>
                       <template v-else>
                         <span class="h4">{{ v.chart }}</span>
                       </template>
-                    </button>
-                  </div>
+                    </b-button>
+                  </b-col>
+                  <!--                  <div class="col-4 pr-0">-->
+                  <!--                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">-->
+                  <!--                     -->
+                  <!--                    </button>-->
+                  <!--                  </div>-->
                 </template>
                 <template v-if="k % 3 === 1">
-                  <div class="col-4 pl-1 pr-1">
-                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
+                  <b-col cols="4" class="pl-1 pr-1">
+                    <b-button variant="light" block @click="doDTMF(v.chart)" class="mb-1">
                       <span class="h4">{{ v.chart }}</span>
-                    </button>
-                  </div>
+                    </b-button>
+                  </b-col>
+                  <!--                  <div class="col-4 pl-1 pr-1">-->
+                  <!--                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">-->
+                  <!--                      <span class="h4">{{ v.chart }}</span>-->
+                  <!--                    </button>-->
+                  <!--                  </div>-->
                 </template>
                 <template v-if="k % 3 === 2">
-                  <div class="col-4 pl-0">
-                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">
+                  <b-col cols="4" class="pl-0">
+                    <b-button variant="light" block @click="doDTMF(v.chart)" class="mb-1">
                       <template v-if="v.icon !== undefined">
-                        <i :class="v.icon"></i>
+                        <!--            <i :class="v.icon"></i>-->
+                        <span style="font-size: 1.25em">{{ v.chart }}</span>
                       </template>
                       <template v-else>
                         <span class="h4">{{ v.chart }}</span>
                       </template>
-                    </button>
-                  </div>
+                    </b-button>
+                  </b-col>
+                  <!--                  <div class="col-4 pl-0">-->
+                  <!--                    <button class="btn btn-lg btn-outline-secondary btn-block mb-1" @click="doDTMF(v.chart)">-->
+                  <!--                      <template v-if="v.icon !== undefined">-->
+                  <!--                        <i :class="v.icon"></i>-->
+                  <!--                      </template>-->
+                  <!--                      <template v-else>-->
+                  <!--                        <span class="h4">{{ v.chart }}</span>-->
+                  <!--                      </template>-->
+                  <!--                    </button>-->
+                  <!--                  </div>-->
                 </template>
               </template>
-            </div>
+            </b-row>
             <b-row>
               <b-col cols="12" class="pb-1">
                 <b-button block variant="success" :disabled="input.transfer === ''" @click="doTranferCall">Transferir llamada</b-button>
@@ -71,16 +95,16 @@
           </template>
           <b-row>
             <template v-if="button.call.status">
-              <b-col cols="8">
+              <b-col cols="6" class="text-left">
                 <!-- Llamar -->
-                <b-button variant="success" @click="doCall" :disabled="button.call.disabled">
+                <b-button block variant="success" @click="doCall" :disabled="button.call.disabled">
                   <b-icon-telephone-fill></b-icon-telephone-fill>
                   <span> Call</span>
                 </b-button>
               </b-col>
-              <b-col cols="4" class="text-right">
+              <b-col cols="6" class="text-right">
                 <!-- Eliminar caractér -->
-                <b-button variant="secondary">
+                <b-button block variant="secondary">
                   <b-icon-backspace-fill></b-icon-backspace-fill>
                 </b-button>
               </b-col>
@@ -179,7 +203,7 @@
           </div>
           <div class="form-group">
             <span>Password</span>
-            <input v-model="params.password" type="password" class="form-control form-control-sm" />
+            <input v-model="params.password" type="text" class="form-control form-control-sm" />
           </div>
           <div class="form-group">
             <span>Domain</span>
