@@ -20,7 +20,4 @@ yarn-error.log*
 *.sln
 *.sw*
 
-
-package-lock.json
 dist/
-dist.rar
