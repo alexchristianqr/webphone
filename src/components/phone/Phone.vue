@@ -20,7 +20,6 @@
           <template v-if="screen.inTransfer">
             <div class="pb-1">
               <b-input-group>
-
                 <b-form-input ref="inputDestination" v-model="input.transfer" maxlength="9"></b-form-input>
 
                 <template #append>
@@ -295,15 +294,12 @@ export default {
         playback: 75,
       },
     },
-    dataList: [
-      { id: 1, phone: '955588297' },
-      { id: 2, phone: '994719466' },
-    ],
+    dataList: [{ id: 1, phone: '955588297' }],
     params: {
       display_name: '204',
       username: '204',
       password: '7015102',
-      domain: '192.168.80.3',
+      domain: '179.6.30.96',
       authorization: '204',
       destination: '955588297',
     },

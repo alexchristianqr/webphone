@@ -1,5 +1,5 @@
 {
-  "name": "webphone-vue",
+  "name": "webphone",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,31 +18,34 @@
     "vuex": "~3.6.2"
   },
   "devDependencies": {
-    "lodash": "^4.17.4",
     "@vue/cli-plugin-babel": "^3.0.5",
     "@vue/cli-plugin-eslint": "^3.0.5",
     "@vue/cli-service": "^3.0.5",
-    "vue-template-compiler": "^2.6.6"
+    "lodash": "^4.17.4",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-template-compiler": "^2.6.6",
+    "prettier": "^2.7.1"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
   },
   "eslintConfig": {
     "root": true,
     "env": {
-      "browser": false,
       "node": true
     },
     "extends": [
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
     "parserOptions": {
       "parser": "babel-eslint"
-    }
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
+    },
+    "rules": {}
   },
   "browserslist": [
     "> 1%",
